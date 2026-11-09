@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocotte Mail – messagerie d'entraînement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--fs:17px;--blue:#1f4e8c;--blue-d:#163a69;--blue-l:#e8eff9;--bg:#f2f4f7;--line:#dce2ea;--txt:#1b2531;--mut:#5b6878;--red:#b42318;--red-l:#fdecea;--green:#1e7b45;--green-l:#e5f4eb;--yel:#fff3c4;--card:#fff;--sel:#dce8f8}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;font-family:'Atkinson Hyperlegible',system-ui,-apple-system,Segoe UI,sans-serif;color:var(--txt);background:var(--bg);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;line-height:1.45}
+button{font:inherit;cursor:pointer;color:inherit}
+input,textarea,select{font:inherit;color:inherit}
+.ic{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em}
+.ic.sm{width:.95em;height:.95em}
+.ic.xl{width:3.5rem;height:3.5rem;stroke-width:1.4;color:#b7c3d1}
+.trainbar{background:var(--yel);border-bottom:1px solid #e9d480;padding:.3rem 1rem;font-size:.82rem;text-align:center}
+header.top{display:flex;align-items:center;gap:.8rem;padding:.55rem 1rem;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1.2rem;color:var(--blue);white-space:nowrap}
+.brand .logo{width:2rem;height:2rem;border-radius:9px;background:var(--blue);display:grid;place-items:center;color:#fff}
+.search{flex:1;max-width:560px;display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0 .4rem 0 .9rem;color:var(--mut)}
+.search:focus-within{border-color:var(--blue);background:#fff}
+.search input{border:0;background:transparent;padding:.5rem .5rem;flex:1;outline:none;min-width:0;color:var(--txt)}
+.hdr-tools{margin-left:auto;display:flex;align-items:center;gap:.3rem}
+.iconbtn{background:none;border:1px solid transparent;border-radius:8px;padding:.35rem .55rem;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap}
+.iconbtn:hover{background:var(--bg);border-color:var(--line)}
+.avatar{width:2.2rem;height:2.2rem;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.85rem;flex:none;letter-spacing:.02em}
+.avatar.sm{width:1.8rem;height:1.8rem;font-size:.72rem}
+.avatar.lg{width:4.5rem;height:4.5rem;font-size:1.6rem}
+.me{display:flex;align-items:center;gap:.5rem;padding-left:.4rem;border-left:1px solid var(--line);margin-left:.3rem}
+.me small{display:block;color:var(--mut);font-size:.75rem}
+#menuBtn{display:none}
+.layout{flex:1;display:grid;grid-template-columns:240px minmax(300px,410px) 1fr;min-height:0}
+nav.side{padding:.8rem;overflow:auto;border-right:1px solid var(--line);background:var(--card)}
+.compose-btn{width:100%;background:var(--blue);color:#fff;border:0;border-radius:14px;padding:.85rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.8rem;box-shadow:0 2px 6px rgba(31,78,140,.25)}
+.compose-btn:hover{background:var(--blue-d)}
+.folder{display:flex;align-items:center;gap:.65rem;width:100%;background:none;border:0;border-radius:10px;padding:.5rem .7rem;text-align:left}
+.folder span:first-of-type{white-space:normal;line-height:1.2;overflow-wrap:anywhere}
+.folder:hover{background:var(--bg)}
+.folder.active{background:var(--blue-l);color:var(--blue-d);font-weight:700}
+.folder.add{color:var(--mut)}
+.folder .count{margin-left:auto;font-size:.8rem;font-weight:700;background:var(--blue);color:#fff;border-radius:999px;padding:0 .45rem;min-width:1.5rem;text-align:center}
+.folder .count.grey{background:#e3e8ee;color:var(--txt)}
+.side h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:1.1rem .7rem .3rem}
+.score{margin:1.2rem .3rem 0;padding:.7rem;border-radius:12px;background:var(--green-l);color:var(--green);font-size:.85rem;display:flex;gap:.5rem;align-items:flex-start}
+#list{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line);background:var(--card)}
+.l-head{display:flex;align-items:center;gap:.6rem;padding:.65rem .9rem;border-bottom:1px solid var(--line);min-height:3.2rem;flex-wrap:wrap}
+.l-head h2{font-size:1.05rem;margin:0}
+.l-head.bulk{background:var(--blue-l)}
+.l-head .sp{flex:1}
+.mut{color:var(--mut)}
+.link{background:none;border:0;color:var(--blue);text-decoration:underline;padding:.2rem;font-size:.9rem}
+.hint{font-size:.82rem;color:var(--mut);background:var(--bg);padding:.45rem .9rem;border-bottom:1px solid var(--line)}
+.rows{overflow:auto;flex:1}
+.row{display:grid;grid-template-columns:auto auto 1fr;gap:.25rem .5rem;align-items:start;padding:.6rem .8rem .6rem .7rem;border-bottom:1px solid var(--line);cursor:pointer;position:relative;outline:none}
+.row:hover{background:#f7f9fb}
+.row:focus-visible{box-shadow:inset 0 0 0 2px var(--blue)}
+.row.sel{background:var(--sel)}
+.row.checked{background:#eef3fb}
+.row.unread::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+.row.unread .r-from,.row.unread .r-sub{font-weight:700}
+.chk{width:1.1rem;height:1.1rem;margin:.25rem 0 0;accent-color:var(--blue);cursor:pointer}
+.star{background:none;border:0;padding:.1rem;color:#9aa6b4;line-height:1}
+.star:hover{color:#d4a017}
+.star.on{color:#e0a800}
+.star.on .ic{fill:#f5c518}
+.r-main{min-width:0}
+.r-top{display:flex;gap:.5rem;align-items:baseline}
+.r-from{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-date{font-size:.8rem;color:var(--mut);white-space:nowrap}
+.row.unread .r-date{color:var(--blue);font-weight:700}
+.r-sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;gap:.35rem;align-items:center}
+.r-sub span{overflow:hidden;text-overflow:ellipsis}
+.r-snip{font-size:.85rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.draftlbl{color:var(--red);font-weight:700}
+.ftag{display:inline-block;font-size:.72rem;background:#e8ecf1;border-radius:6px;padding:0 .35rem;margin-top:.2rem;color:var(--mut)}
+.empty-list{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mut);padding:2rem;text-align:center}
+#reader{display:flex;flex-direction:column;min-height:0;background:var(--card)}
+.r-bar{display:flex;flex-wrap:wrap;gap:.25rem;padding:.5rem .7rem;border-bottom:1px solid var(--line);align-items:center}
+.tbtn{display:inline-flex;align-items:center;gap:.35rem;background:none;border:1px solid var(--line);border-radius:9px;padding:.35rem .65rem;font-size:.88rem;white-space:nowrap}
+.tbtn:hover{background:var(--bg)}
+.tbtn.danger{color:var(--red)}
+.tbtn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tbtn.primary:hover{background:var(--blue-d)}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:0 .2rem}
+.mob-back{display:none}
+.r-scroll{overflow:auto;flex:1;padding:1.3rem 1.8rem 2rem}
+.subj{font-size:1.45rem;margin:0 0 1rem;line-height:1.25}
+.mhdr{display:flex;gap:.8rem;align-items:flex-start;margin-bottom:1.2rem;flex-wrap:wrap}
+.mhdr-info{flex:1;min-width:14rem}
+.addr{color:var(--mut);font-size:.9rem;word-break:break-all}
+.mhdr .date{font-size:.85rem;white-space:nowrap}
+.inbanner{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem .9rem;border-radius:10px;margin-bottom:1rem;font-size:.92rem}
+.inbanner.warn{background:var(--red-l);color:#7a1a12}
+.inbanner.info{background:var(--blue-l);color:var(--blue-d)}
+.mbody{font-size:1rem;line-height:1.6;overflow-wrap:anywhere;max-width:46rem}
+.mbody p{margin:0 0 .9em}
+.mbody a{color:#1a5fb4;text-decoration:underline;cursor:pointer}
+.mbody a.btnlink{display:inline-block;color:#fff;text-decoration:none;padding:.6rem 1.3rem;border-radius:6px;font-weight:700}
+.mbody .quote{white-space:pre-wrap}
+.atts{margin-top:1.6rem;border-top:1px solid var(--line);padding-top:1rem}
+.attlist{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:.5rem}
+.att{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;width:11rem;border:1px solid var(--line);border-radius:10px;padding:.5rem;background:#fff;text-align:left}
+.att:hover{border-color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.att img{width:100%;height:6rem;object-fit:cover;border-radius:6px;background:var(--bg)}
+.att .thumb{width:100%;height:6rem;border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:1.1rem;color:#fff}
+.att-n{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.att small{color:var(--mut)}
+.quick{display:flex;gap:.6rem;margin-top:2rem;flex-wrap:wrap}
+.quick .tbtn{padding:.6rem 1.1rem;font-size:.95rem}
+.r-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mut);text-align:center;padding:2rem}
+.contact-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;padding:2.5rem 1rem}
+.contact-card h2{margin:.4rem 0 0}
+.contact-card .btns{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+/* compose */
+#composeRoot .compose{position:fixed;right:1.2rem;bottom:1.2rem;width:min(42rem,calc(100vw - 2rem));height:min(40rem,calc(100dvh - 2.4rem));background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(16,30,54,.28);display:flex;flex-direction:column;z-index:40;border:1px solid var(--line)}
+.c-head{display:flex;align-items:center;justify-content:space-between;background:var(--blue);color:#fff;padding:.55rem .6rem .55rem 1rem;border-radius:14px 14px 0 0;font-weight:700}
+.c-head .iconbtn{color:#fff}
+.c-head .iconbtn:hover{background:rgba(255,255,255,.15);border-color:transparent}
+.c-row{display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--line);padding:0 .9rem;position:relative}
+.c-row label{color:var(--mut);min-width:3.2rem;font-size:.92rem}
+.c-row input{flex:1;border:0;outline:none;padding:.6rem 0;min-width:0;background:transparent}
+.c-row:focus-within{background:#fafcff}
+.c-row .help{font-size:.75rem;color:var(--mut);white-space:nowrap}
+.ac{flex:1;position:relative;display:flex}
+.sugg{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:5;overflow:hidden}
+.sugg button{display:flex;gap:.6rem;align-items:center;width:100%;background:none;border:0;padding:.5rem .7rem;text-align:left}
+.sugg button:hover{background:var(--blue-l)}
+.sugg small{color:var(--mut)}
+#cBody{flex:1;border:0;outline:none;resize:none;padding:.9rem;line-height:1.55;min-height:6rem}
+.c-atts{display:flex;flex-wrap:wrap;gap:.4rem;padding:0 .9rem}
+.c-atts:not(:empty){padding:.5rem .9rem}
+.chip{display:inline-flex;align-items:center;gap:.4rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:.25rem .3rem .25rem .6rem;font-size:.85rem}
+.chip button{background:none;border:0;padding:.1rem;border-radius:5px;display:flex}
+.chip button:hover{background:#dfe5ec}
+.c-foot{display:flex;gap:.5rem;align-items:center;padding:.7rem .9rem;border-top:1px solid var(--line);flex-wrap:wrap}
+.c-foot .sp{flex:1}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:.55rem 1rem;display:inline-flex;align-items:center;gap:.4rem}
+.btn:hover{background:var(--bg)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700}
+.btn.primary:hover{background:var(--blue-d)}
+.btn.danger{color:var(--red);border-color:#f0c4bf}
+.btn.danger:hover{background:var(--red-l)}
+/* dialogs */
+.overlay{position:fixed;inset:0;background:rgba(15,25,40,.45);display:grid;place-items:center;z-index:100;padding:1rem}
+.dlg{background:#fff;border-radius:16px;max-width:30rem;width:100%;padding:1.4rem 1.5rem 1.2rem;box-shadow:0 20px 50px rgba(0,0,0,.3);max-height:calc(100dvh - 2rem);overflow:auto}
+.dlg.wide{max-width:40rem}
+.dlg h2{margin:0 0 .8rem;font-size:1.25rem}
+.dlg-body p{margin:.4rem 0 .7rem}
+.dlg-body ul{padding-left:1.2rem;margin:.3rem 0 .8rem}
+.dlg-body li{margin-bottom:.35rem}
+.dlg-btns{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:flex-end;margin-top:1rem}
+.field{width:100%;border:1px solid #c7d0db;border-radius:10px;padding:.6rem .75rem;margin:.2rem 0 .8rem;background:#fff}
+.field:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
+textarea.field{resize:vertical;min-height:5rem}
+.dlg label{font-weight:700;font-size:.92rem}
+.okbox{background:var(--green-l);color:#14532d;padding:.7rem .9rem;border-radius:10px}
+.alertbox{background:var(--red-l);color:#7a1a12;padding:.7rem .9rem;border-radius:10px}
+.docpage{background:#fff;border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.08);padding:1.6rem;white-space:pre-wrap;font-family:Georgia,serif;font-size:.95rem;line-height:1.6;max-height:55vh;overflow:auto}
+.preview-img{width:100%;border-radius:10px;display:block}
+.docpick{display:flex;align-items:center;gap:.7rem;width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:.55rem .7rem;margin-bottom:.45rem;text-align:left}
+.docpick:hover{border-color:var(--blue);background:var(--blue-l)}
+.docpick .thumb{width:2.6rem;height:2.6rem;border-radius:6px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.7rem;flex:none;overflow:hidden}
+.docpick .thumb img{width:100%;height:100%;object-fit:cover}
+.gloss dt{font-weight:700;margin-top:.6rem}
+.gloss dd{margin:0 0 .2rem 0;color:#333}
+/* pop menu */
+.pop{position:fixed;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:90;padding:.3rem;min-width:13rem}
+.pop button{display:flex;align-items:center;gap:.6rem;width:100%;background:none;border:0;padding:.5rem .7rem;border-radius:8px;text-align:left}
+.pop button:hover{background:var(--blue-l)}
+.pop hr{border:0;border-top:1px solid var(--line);margin:.3rem 0}
+/* toast & status */
+#toasts{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);display:flex;flex-direction:column;gap:.5rem;z-index:120;align-items:center;pointer-events:none}
+.toast{background:#1b2531;color:#fff;border-radius:12px;padding:.65rem 1rem;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:.8rem;align-items:center;pointer-events:auto;animation:tin .25s ease}
+.toast button{background:none;border:0;color:#9cc3ff;font-weight:700;text-decoration:underline;padding:0}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#status{position:fixed;left:0;bottom:0;background:#f3f4f6;border:1px solid #c9ced6;border-left:0;border-bottom:0;border-radius:0 8px 0 0;padding:.2rem .7rem;font-size:.8rem;font-family:ui-monospace,Menlo,Consolas,monospace;z-index:130;max-width:80vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:none}
+/* onboarding */
+.onb{position:fixed;inset:0;background:linear-gradient(135deg,#1f4e8c,#2f6db5);display:grid;place-items:center;z-index:200;padding:1rem}
+.onb .card{background:#fff;border-radius:20px;padding:2rem;max-width:28rem;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.onb h1{margin:.6rem 0 .3rem;font-size:1.5rem}
+.onb .preview{background:var(--blue-l);border-radius:10px;padding:.6rem .8rem;margin:.3rem 0 1.2rem;font-weight:700;color:var(--blue-d);word-break:break-all}
+.drawer-bg{display:none}
+.exo .exn{width:1.55rem;height:1.55rem;border-radius:50%;background:#e3e8ee;display:grid;place-items:center;font-size:.8rem;font-weight:700;flex:none}
+.exo span:last-child{white-space:normal!important;font-size:.92rem;line-height:1.25}
+.exo.done{color:var(--green)}
+.exo.done .exn{background:var(--green);color:#fff}
+.modes{margin:.2rem 0 1.1rem}
+.modes label{display:flex;gap:.6rem;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:.55rem .7rem;margin-top:.4rem;cursor:pointer;font-weight:400}
+.modes label:has(input:checked){border-color:var(--blue);background:var(--blue-l)}
+.modes input{margin-top:.3rem;accent-color:var(--blue)}
+.meter{height:8px;background:#e3e8ee;border-radius:99px;overflow:hidden}
+.meter span{display:block;height:100%;width:0;transition:width .2s,background .2s}
+.crit{list-style:none;padding:0!important;margin:.2rem 0 .9rem!important;font-size:.88rem;color:var(--red)}
+.crit li{margin:.15rem 0!important}
+.crit li.ok{color:var(--green)}
+
+/* ---------- apparences (aucun logo ni nom de marque) ---------- */
+body[data-theme=gmail]{--blue:#0b57d0;--blue-d:#0842a0;--blue-l:#d3e3fd;--bg:#f6f8fc;--sel:#c2e7ff;font-family:Roboto,Arial,sans-serif}
+body[data-theme=gmail] header.top,body[data-theme=gmail] nav.side{background:#f6f8fc;border-color:#f6f8fc}
+body[data-theme=gmail] .search{background:#e9eef6;border-color:#e9eef6}
+body[data-theme=gmail] .compose-btn{background:#c2e7ff;color:#001d35;border-radius:16px;box-shadow:none;justify-content:flex-start;padding:1rem 1.4rem;width:auto}
+body[data-theme=gmail] .compose-btn:hover{background:#b3dcf7;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+body[data-theme=gmail] .folder{border-radius:0 999px 999px 0}
+body[data-theme=gmail] .folder.active{background:#d3e3fd;color:#041e49}
+body[data-theme=gmail] .layout{grid-template-columns:256px 1fr}
+body[data-theme=gmail] #list{border-radius:16px 16px 0 0;margin-right:1rem}
+body[data-theme=gmail] #reader{display:none;border-radius:16px 16px 0 0;margin-right:1rem}
+body[data-theme=gmail].reading #reader{display:flex}
+body[data-theme=gmail].reading #list{display:none}
+body[data-theme=gmail] .mob-back{display:inline-flex}
+body[data-theme=outlook]{--blue:#0f6cbd;--blue-d:#115ea3;--blue-l:#ebf3fc;--bg:#f5f5f5;--sel:#cfe4fa;font-family:'Segoe UI',Arial,sans-serif}
+body[data-theme=outlook] header.top{background:#0f6cbd;border-color:#0f6cbd;color:#fff}
+body[data-theme=outlook] .brand,body[data-theme=outlook] .hdr-tools .iconbtn,body[data-theme=outlook] .me small{color:#fff}
+body[data-theme=outlook] .brand .logo{background:#fff;color:#0f6cbd}
+body[data-theme=outlook] .hdr-tools .iconbtn:hover{background:rgba(255,255,255,.15);border-color:transparent}
+body[data-theme=outlook] .search{background:#fff}
+body[data-theme=outlook] .compose-btn{border-radius:4px;box-shadow:none}
+body[data-theme=outlook] .folder{border-radius:4px}
+body[data-theme=outlook] .folder.active{background:#ebf3fc;box-shadow:inset 3px 0 0 #0f6cbd}
+body[data-theme=orange]{--blue:#ff7900;--blue-d:#e06a00;--blue-l:#fff1e5;--bg:#f4f4f4;--sel:#ffe2c7;font-family:Helvetica,Arial,sans-serif}
+body[data-theme=orange] header.top{background:#000;border-color:#000;color:#fff}
+body[data-theme=orange] .brand,body[data-theme=orange] .hdr-tools .iconbtn,body[data-theme=orange] .me small{color:#fff}
+body[data-theme=orange] .brand .logo{background:#ff7900;color:#000}
+body[data-theme=orange] .hdr-tools .iconbtn:hover{background:rgba(255,255,255,.15);border-color:transparent}
+body[data-theme=orange] .search{background:#fff}
+body[data-theme=orange] .compose-btn,body[data-theme=orange] .btn.primary,body[data-theme=orange] .tbtn.primary{color:#000}
+body[data-theme=orange] .compose-btn{border-radius:0;box-shadow:none;font-weight:700}
+body[data-theme=orange] .folder{border-radius:0}
+body[data-theme=orange] .folder.active{background:#fff1e5;color:#000;box-shadow:inset 4px 0 0 #ff7900}
+body[data-theme=orange] .c-head{background:#000}
+body[data-theme=laposte]{--blue:#003da5;--blue-d:#002e7d;--blue-l:#e6edf8;--bg:#f2f4f8;--sel:#d6e1f3;font-family:Arial,sans-serif}
+body[data-theme=laposte] header.top{background:#003da5;border-color:#003da5;color:#fff}
+body[data-theme=laposte] .brand,body[data-theme=laposte] .hdr-tools .iconbtn,body[data-theme=laposte] .me small{color:#fff}
+body[data-theme=laposte] .brand .logo{background:#ffc800;color:#003da5}
+body[data-theme=laposte] .hdr-tools .iconbtn:hover{background:rgba(255,255,255,.15);border-color:transparent}
+body[data-theme=laposte] .search{background:#fff}
+body[data-theme=laposte] .compose-btn{background:#ffc800;color:#003da5;border-radius:6px;box-shadow:none}
+body[data-theme=laposte] .compose-btn:hover{background:#f0bb00}
+body[data-theme=laposte] .folder.active{background:#e6edf8;box-shadow:inset 4px 0 0 #ffc800}
+body[data-theme=gmail] .compose-btn{white-space:nowrap}
+body[data-theme=orange] .folder .count:not(.grey){color:#000}
+body[data-theme=orange] .row.unread .r-date,body[data-theme=orange] .link,body[data-theme=orange] .mbody a{color:#a84f00}
+
+/* ---------- page « Présentation de la séance » (#seance) ---------- */
+.seance{position:fixed;inset:0;z-index:300;background:#fff;overflow:auto;display:flex;flex-direction:column;font-size:clamp(14px,1.3vw,26px)}
+.seance .s-top{background:var(--blue);color:#fff;padding:1em 1.6em;display:flex;align-items:center;gap:.8em}
+.seance .s-top .logo{width:2.2em;height:2.2em;border-radius:.5em;background:#fff;color:var(--blue);display:grid;place-items:center;flex:none}
+.seance .s-top .logo .ic{width:1.4em;height:1.4em}
+.seance h1{margin:0;font-size:1.9em;line-height:1.1}
+.seance .s-goal{margin:.2em 0 0;font-size:1.05em;opacity:.95}
+.seance .s-main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:1.6em;padding:1.1em 1.6em}
+.seance h2{font-size:1.15em;margin:0 0 .6em;color:var(--blue-d)}
+.seance .s-obj{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.55em}
+.seance .s-obj li{display:flex;align-items:center;gap:.7em;background:var(--blue-l);border-radius:.6em;padding:.6em .8em;font-size:1.05em}
+.seance .s-obj .ic{width:1.5em;height:1.5em;color:var(--blue);flex:none}
+.seance .s-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.35em}
+.seance .s-steps li{display:grid;grid-template-columns:2em 1fr auto;align-items:center;gap:.6em;border:2px solid var(--line);border-radius:.6em;padding:.3em .7em}
+.seance .s-steps .n{width:1.7em;height:1.7em;border-radius:50%;background:#e3e8ee;display:grid;place-items:center;font-weight:700;font-size:.85em}
+.seance .s-steps small{display:block;color:var(--mut);font-size:.8em}
+.seance .s-steps .d{font-weight:700;color:var(--mut);white-space:nowrap}
+.seance .s-steps li.pause{background:#f4f5f7;color:var(--mut);font-style:italic}
+.seance .s-steps li.done{opacity:.5}
+.seance .s-steps li.done .n{background:var(--green);color:#fff}
+.seance .s-steps li.cur{border-color:var(--blue);background:var(--blue-l);box-shadow:0 0 0 3px var(--blue-l);font-weight:700}
+.seance .s-steps li.cur .n{background:var(--blue);color:#fff}
+.seance .s-foot{margin-left:auto;display:flex;gap:.5em;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.seance .s-foot .btn{font-size:.8em;color:var(--txt)}
+.seance .s-foot .btn.primary{background:#fff;color:var(--blue-d);border-color:#fff}
+@media (max-width:800px){.seance .s-main{grid-template-columns:1fr}}
+@media (max-width:1150px){.layout{grid-template-columns:205px minmax(280px,340px) 1fr}.me div{display:none}}
+@media (max-width:900px){
+ #menuBtn{display:inline-flex}
+ .layout{grid-template-columns:minmax(280px,360px) 1fr}
+ nav.side{position:fixed;left:0;top:0;bottom:0;width:260px;z-index:60;transform:translateX(-100%);transition:transform .2s;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+ body.drawer nav.side{transform:none}
+ body.drawer .drawer-bg{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:55}
+ .brand span.t{display:none}
+ .hdr-tools .lbl{display:none}
+}
+@media (max-width:680px){
+ .layout{grid-template-columns:1fr}
+ #reader{display:none}
+ body.reading #reader{display:flex}
+ body.reading #list{display:none}
+ .mob-back{display:inline-flex}
+ .r-scroll{padding:1rem}
+ .tbtn span{display:none}
+ .tbtn.mob-back span,.quick .tbtn span{display:inline}
+ #composeRoot .compose{inset:0;width:auto;height:auto;border-radius:0;right:0;bottom:0}
+ .c-head{border-radius:0}
+ .search{display:none}
+ .c-row .help{display:none}
+}
+</style>
+</head>
+<body>
+<div class="trainbar">🎓 <b>Messagerie d'entraînement</b> — aucun message n'est réellement envoyé sur Internet. Vous pouvez tout essayer sans risque.</div>
+<header class="top">
+  <button class="iconbtn" id="menuBtn" data-act="menu" aria-label="Menu"></button>
+  <div class="brand"><span class="logo" id="logo"></span><span class="t">Cocotte Mail</span></div>
+  <label class="search"><span id="searchIc"></span><input id="q" type="search" placeholder="Rechercher dans les messages" aria-label="Rechercher dans les messages"></label>
+  <div class="hdr-tools">
+    <button class="iconbtn" data-act="fs-" title="Réduire la taille du texte" aria-label="Réduire le texte">A−</button>
+    <button class="iconbtn" data-act="fs+" title="Agrandir la taille du texte" aria-label="Agrandir le texte" style="font-size:1.15em">A+</button>
+    <button class="iconbtn" data-act="help" id="helpBtn"></button>
+    <button class="iconbtn" data-act="settings" id="setBtn"></button>
+    <div class="me" id="me"></div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="side" id="side" aria-label="Dossiers"></nav>
+  <section id="list" aria-label="Liste des messages"></section>
+  <section id="reader" aria-label="Message"></section>
+</div>
+<div class="drawer-bg" data-act="menu"></div>
+<div id="composeRoot"></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="status"></div>
+
+<script>
+(function(){
+'use strict';
+const DOMAIN='cocotte-mail.fr';
+const KEY='cocotte-mail-v1';
+const sec=()=>!!(S&&S.mode==='securite');
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+/* ---------- icons ---------- */
+const P={
+ inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+ star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+ send:'<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
+ draft:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/>',
+ spam:'<path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+ folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+ users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ pen:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+ reply:'<path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+ replyall:'<path d="M7 17l-5-5 5-5"/><path d="M12 17l-5-5 5-5"/><path d="M22 18v-2a4 4 0 0 0-4-4H7"/>',
+ forward:'<path d="M15 17l5-5-5-5"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/>',
+ clip:'<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
+ back:'<path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+ search:'<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>',
+ x:'<path d="M18 6 6 18"/><path d="M6 6l12 12"/>',
+ mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/>',
+ mailopen:'<path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6z"/><path d="M22 10l-10 7L2 10"/>',
+ restore:'<path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>',
+ shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>',
+ menu:'<path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/>',
+ plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+ help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+ download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+ userplus:'<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/>',
+ info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'
+};
+const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${P[n]||''}</svg>`;
+
+/* ---------- images & documents ---------- */
+const svgUrl=s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+const IMG_PICNIC=svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 260'><rect width='400' height='260' fill='#bfe3ff'/><circle cx='330' cy='60' r='32' fill='#ffd54a'/><ellipse cx='110' cy='55' rx='40' ry='14' fill='#fff' opacity='.9'/><ellipse cx='140' cy='48' rx='28' ry='12' fill='#fff' opacity='.9'/><path d='M0 170 Q100 130 200 160 T400 150 V260 H0z' fill='#7cc46b'/><path d='M0 205 Q120 180 260 205 T400 198 V260 H0z' fill='#5aa84d'/><g transform='translate(150 200) skewX(-25)'><rect width='150' height='45' fill='#e5484d'/><rect x='18' width='16' height='45' fill='#fff' opacity='.75'/><rect x='58' width='16' height='45' fill='#fff' opacity='.75'/><rect x='98' width='16' height='45' fill='#fff' opacity='.75'/></g><rect x='205' y='182' width='40' height='26' rx='4' fill='#a0682e'/><path d='M210 182 q15 -18 30 0' stroke='#7a4b1e' stroke-width='4' fill='none'/><circle cx='70' cy='140' r='30' fill='#3f8f3a'/><rect x='64' y='155' width='12' height='45' fill='#7a5230'/></svg>`);
+const IMG_GARDEN=svgUrl(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 260'><rect width='400' height='260' fill='#eaf6e3'/><rect y='190' width='400' height='70' fill='#8b5e3c'/><g stroke='#3c8d2f' stroke-width='5'><path d='M60 190V110'/><path d='M140 190V95'/><path d='M220 190V120'/><path d='M300 190V100'/></g><g><circle cx='60' cy='100' r='22' fill='#ff6b8b'/><circle cx='60' cy='100' r='8' fill='#ffd54a'/><circle cx='140' cy='85' r='24' fill='#ffb347'/><circle cx='140' cy='85' r='9' fill='#7a3e00'/><circle cx='220' cy='110' r='20' fill='#b48cff'/><circle cx='220' cy='110' r='7' fill='#ffd54a'/><circle cx='300' cy='90' r='24' fill='#ff5252'/><circle cx='300' cy='90' r='9' fill='#ffd54a'/></g><circle cx='360' cy='40' r='22' fill='#ffd54a'/></svg>`);
+const MYDOCS=[
+ {name:'photo_jardin.jpg',size:'1,2 Mo',type:'image',data:IMG_GARDEN},
+ {name:'CV_2026.pdf',size:'96 Ko',type:'doc',preview:'CURRICULUM VITAE\n\nExpérience\n• 2018 – 2026 : agent d\'accueil, mairie\n• 2012 – 2018 : vendeur·se en librairie\n\nCompétences\n• Accueil du public\n• Bureautique : traitement de texte, messagerie\n\nCentres d\'intérêt\nRandonnée, jardinage, lecture'},
+ {name:'attestation_domicile.pdf',size:'54 Ko',type:'doc',preview:'ATTESTATION D\'HÉBERGEMENT\n\nJe soussigné(e) ……………………, demeurant au 12 rue des Lilas, 02110 Bohain-en-Vermandois,\natteste sur l\'honneur héberger à mon domicile ……………………\n\nFait à Bohain-en-Vermandois, le ……………\n\nSignature'},
+ {name:'recette_tarte_pommes.docx',size:'22 Ko',type:'doc',preview:'TARTE AUX POMMES DE MAMIE\n\n• 1 pâte brisée\n• 5 pommes\n• 50 g de sucre\n• 1 sachet de sucre vanillé\n• 30 g de beurre\n\nÉplucher et couper les pommes en fines lamelles.\nLes disposer sur la pâte, saupoudrer de sucre, ajouter le beurre en petits morceaux.\nCuire 35 minutes à 180 °C.'}
+];
+const EXTCOL={pdf:'#c0392b',doc:'#2b5797',docx:'#2b5797',xls:'#1e7145',xlsx:'#1e7145',jpg:'#8e44ad',jpeg:'#8e44ad',png:'#8e44ad',txt:'#555',exe:'#7f1d1d',zip:'#6b4f1d'};
+const ext=n=>(String(n).split('.').pop()||'').toLowerCase();
+
+/* ---------- contacts ---------- */
+const CONTACTS=[
+ {name:'Marie Dupont',email:'marie.dupont@'+DOMAIN,sim:true,hello:'Coucou',sign:'Bises,\nMarie'},
+ {name:'Paul Martin',email:'paul.martin@'+DOMAIN,sim:true,hello:'Salut',sign:'À bientôt,\nPaul'},
+ {name:'Sophie Bernard',email:'sophie.bernard@'+DOMAIN,sim:true,hello:'Bonjour',sign:'Belle journée,\nSophie'},
+ {name:'Les Marcheurs du Vermandois',email:'marcheurs.vermandois@'+DOMAIN,sim:true,vous:true,hello:'Bonjour',sign:'Amicalement,\nJacques, pour les Marcheurs du Vermandois'},
+ {name:'La Cocotte – En Terre Connectée',email:'accueil.lacocotte@'+DOMAIN,sim:true,auto:"Bonjour,\n\nNous avons bien reçu votre message et nous vous répondrons dans les meilleurs délais.\n\nCeci est une réponse automatique, merci de ne pas y répondre.\n\nL'équipe de La Cocotte, tiers-lieu numérique de Bohain-en-Vermandois"},
+ {name:'Mairie de Bohain-en-Vermandois',email:'etat-civil.bohain@'+DOMAIN,sim:true,auto:"Madame, Monsieur,\n\nVotre message a bien été transmis au service État civil. Il sera traité sous 5 jours ouvrés.\n\nCeci est un message automatique, merci de ne pas y répondre.\n\nMairie de Bohain-en-Vermandois – Service État civil"}
+];
+
+/* ---------- state ---------- */
+let S=null;
+const V={folder:'inbox',sel:null,checked:new Set(),q:'',contact:null};
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.user&&o.messages)S=o}}catch(e){}}
+function save(){if(!S)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){try{const c=JSON.parse(JSON.stringify(S));c.messages.forEach(m=>(m.attachments||[]).forEach(a=>{if(a.user){delete a.data}}));localStorage.setItem(KEY,JSON.stringify(c))}catch(e2){}}}
+function slug(s){return norm(s).trim().replace(/[^a-z0-9]+/g,'.').replace(/^\.+|\.+$/g,'')}
+const byId=id=>S.messages.find(m=>m.id===id);
+const me=()=>S.user.email.toLowerCase();
+const fill=s=>tt(String(s).replace(/\{prenom\}/g,esc(S.user.first)));
+
+function seed(first,last,mode){
+ const local=[slug(first),slug(last)].filter(Boolean).join('.')||'moi';
+ const email=local+'@'+DOMAIN;
+ const now=Date.now(),M=60e3,H=60*M,D=24*H;
+ S={v:1,user:{first:first.trim(),last:last.trim(),name:(first.trim()+' '+last.trim()).trim(),email,signature:''},folders:[],contacts:CONTACTS.map(c=>Object.assign({},c)),messages:[],nextId:1,fs:17,found:[],phishTotal:0,mode:mode==='securite'?'securite':'decouverte',ex:{}};
+ const add=o=>{if((o.phishing||o.secOnly)&&!sec())return;S.messages.push(Object.assign({id:S.nextId++,folder:'inbox',to:[email],cc:[],bcc:[],read:true,starred:false,attachments:[]},o))};
+ add({from:{name:'La Cocotte – En Terre Connectée',email:'accueil.lacocotte@'+DOMAIN},subject:"Bienvenue dans votre messagerie d'entraînement 👋",date:now-4*M,read:false,
+  html:`<p>Bonjour {prenom},</p><p>Bienvenue dans <strong>Cocotte Mail</strong>, une messagerie d'entraînement. Ici, vous pouvez tout essayer sans risque : écrire, répondre, supprimer, classer… Aucun message ne part réellement sur Internet.</p><p>Quelques repères :</p><ul><li>À gauche, les <strong>dossiers</strong> : Boîte de réception, Envoyés, Brouillons, Corbeille…</li><li>Au milieu, la <strong>liste des messages</strong>. Ceux écrits en gras ne sont pas encore lus.</li><li>À droite, le <strong>message ouvert</strong>, avec les boutons Répondre, Transférer, Supprimer…</li></ul><p>Pour commencer, cliquez sur le bouton <strong>{compose}</strong> en haut à gauche.</p><p>Vous pouvez aussi consulter <a class="safe" data-url="https://www.cocotte-mail.fr/programme-des-ateliers">le programme des ateliers de La Cocotte</a>.</p><p>Bon atelier !<br>L'équipe de La Cocotte</p>`,
+  legit:"Ce message est fiable : il vient de La Cocotte, le tiers-lieu qui organise l'atelier, il ne vous demande ni argent ni mot de passe et ne vous met pas la pression."});
+ add({k:'marie',from:{name:'Marie Dupont',email:'marie.dupont@'+DOMAIN},subject:"Photos de la tournée d'été ☀️",date:now-52*M,read:false,
+  html:`<p>Coucou {prenom} !</p><p>Je retrouve enfin la photo de la tournée d'été, place Pezin, au mois d'août. Quelle belle journée on a passé !</p><p>On y retourne l'année prochaine ?</p><p>Bises,<br>Marie</p>`,
+  attachments:[{name:'photo_tournee_ete.jpg',size:'2,4 Mo',type:'image',data:IMG_PICNIC}],
+  legit:"Ce message vient de Marie, une personne que vous connaissez et qui est dans vos contacts. Elle vous envoie une photo souvenir : rien de suspect."});
+ add({from:{name:'Banque Horizon',email:'securite@banque-horlzon-alerte.com'},subject:'URGENT : votre compte sera suspendu sous 24h',date:now-2*H-10*M,read:false,phishing:true,ex:1,
+  html:`<div style="border:1px solid #d0d7e2;border-radius:6px;padding:18px;max-width:560px"><p style="font-size:1.3em;font-weight:bold;color:#0a3d91;margin-bottom:14px">🏦 BANQUE HORIZON</p><p>Cher client,</p><p>Nous avons détecté une activité inhabituelle sur votre compte. Par mesure de sécurité, votre accès sera <strong>suspendu dans les 24 heures</strong> si vous ne confirmez pas vos informations.</p><p style="text-align:center;margin:20px 0"><a class="trap btnlink" style="background:#0a3d91" data-url="http://banque-horizon.verif-compte-securise.xyz/connexion">Confirmer mes informations</a></p><p>Munissez-vous de votre identifiant, de votre mot de passe et de votre carte bancaire.</p><p>Cordialement,<br>Le service sécurité</p></div>`,
+  clues:["L'adresse de l'expéditeur est fausse : « horlzon » s'écrit avec un L à la place du I, et le nom se termine par un bizarre « -alerte.com ».","Le message crée l'urgence (« sous 24h ») pour vous faire agir sans réfléchir.","« Cher client » : votre vraie banque connaît votre nom et l'utilise.","Le bouton mène vers un site qui n'a rien à voir avec la banque (…verif-compte-securise.xyz). Astuce : passez la souris sur un lien sans cliquer, son adresse s'affiche en bas à gauche de l'écran.","Une banque ne demande JAMAIS votre mot de passe ou votre numéro de carte par mail."]});
+ add({k:'rando',from:{name:'Les Marcheurs du Vermandois',email:'marcheurs.vermandois@'+DOMAIN},subject:'Sortie de dimanche : le programme',date:now-D-3*H,
+  html:`<p>Bonjour à toutes et à tous,</p><p>Vous trouverez en pièce jointe le programme de notre sortie de dimanche : une balade dans Bohain, sur les pas d'Henri Matisse.</p><p>Pensez à prévoir de bonnes chaussures et de l'eau. En cas de pluie, la sortie sera reportée.</p><p>Merci de me confirmer votre présence en répondant à ce message.</p><p>Amicalement,<br>Jacques, pour les Marcheurs du Vermandois</p>`,
+  attachments:[{name:'programme_balade.pdf',size:'84 Ko',type:'doc',preview:"LES MARCHEURS DU VERMANDOIS\nSortie du dimanche – Sur les pas d'Henri Matisse\n\n9h00  Rendez-vous place Pezin, Bohain-en-Vermandois\n9h15  Départ (6 km, niveau facile)\n10h30 Passage devant la Maison familiale d'Henri Matisse, rue du Château\n12h00 Retour place Pezin\n\nÀ prévoir : chaussures de marche, eau, vêtement de pluie.\nContact le jour J : Jacques"}],
+  legit:"C'est un message de votre club de marche, une association que vous connaissez. Il contient un programme attendu et ne réclame ni argent ni informations personnelles."});
+ add({from:{name:'Colis Express',email:'noreply@colis-xpress-livraison.info'},subject:'Votre colis est en attente – frais de 1,99 €',date:now-3*H,read:false,phishing:true,ex:2,
+  html:`<div style="max-width:560px"><p style="background:#ffcc00;padding:10px 14px;font-weight:bold;margin:0 0 14px">📦 COLIS EXPRESS – Avis de passage</p><p>Bonjour,</p><p>Votre colis n° FR8823-XK n'a pas pu être livré car des frais de réexpédition de <strong>1,99 €</strong> n'ont pas été réglés.</p><p>Sans paiement sous <strong>48 heures</strong>, votre colis sera retourné à l'expéditeur.</p><p>Pour régler ces frais, rendez-vous sur notre site officiel :<br><a class="trap" data-url="https://colis-xpress-paiement.top/reglement?id=FR8823">https://www.colis-express.fr/suivi/FR8823</a></p><p>Merci de votre confiance.</p></div>`,
+  clues:["Vous n'attendez peut-être aucun colis : ce genre de message est envoyé au hasard à des milliers de personnes.","Le petit montant (1,99 €) est là pour vous rassurer… le vrai but est de récupérer votre numéro de carte bancaire.","On vous presse avec un délai (48 heures).","Le texte du lien affiche une adresse rassurante (www.colis-express.fr), mais quand on pose la souris dessus, la vraie adresse apparaît en bas de l'écran : colis-xpress-paiement.top. C'est la vraie adresse qui compte !","L'adresse de l'expéditeur est elle aussi bizarre (colis-xpress-livraison.info).","Aucun détail précis : pas votre nom, pas le nom du magasin où vous auriez commandé."]});
+ add({k:'paul',from:{name:'Paul Martin',email:'paul.martin@'+DOMAIN},to:[email,'marie.dupont@'+DOMAIN,'sophie.bernard@'+DOMAIN],subject:'Repas de famille le 15',date:now-2*D-2*H,starred:true,
+  html:`<p>Bonjour à tous,</p><p>Je vous propose qu'on se retrouve le dimanche 15 à midi à la maison.</p><p>Pouvez-vous me dire qui vient et ce que vous apportez (entrée, plat, dessert) ?</p><p>Merci de <strong>répondre à tous</strong> pour que chacun voie les réponses !</p><p>Paul</p>`,
+  legit:"C'est un message de Paul, qui fait partie de vos contacts. Il organise un repas : rien de suspect."});
+ add({from:{name:"Les Créations d'Henri",email:'jardin.creationsdhenri@'+DOMAIN},subject:'Les légumes de la semaine 🥕',date:now-3*D-5*H,
+  html:`<div style="max-width:560px"><p style="font-size:1.25em;font-weight:bold;color:#2e7d32;margin-bottom:10px">🌱 Les Créations d'Henri – Le jardin solidaire de l'AVES</p><p>Bonjour,</p><p>Cette semaine au jardin, les légumes de saison sont prêts : poireaux, carottes, potimarrons et choux, cultivés sans pesticides à Bohain-en-Vermandois.</p><p><a class="safe" data-url="https://www.cocotte-mail.fr/legumes-de-saison">Voir les légumes de la semaine</a></p><hr style="border:0;border-top:1px solid #ddd;margin:18px 0"><p style="font-size:.85em;color:#777">Vous recevez cette lettre car vous vous êtes inscrit sur notre site. <a class="safe unsub" data-url="https://www.cocotte-mail.fr/desabonnement">Se désabonner</a></p></div>`,
+  legit:"C'est une lettre d'information (newsletter) à laquelle vous êtes abonné. Ce n'est pas une arnaque : si vous ne voulez plus la recevoir, utilisez le lien « Se désabonner » tout en bas du message."});
+ add({from:{name:'Mairie de Bohain-en-Vermandois',email:'etat-civil.bohain@'+DOMAIN},subject:"Confirmation de votre rendez-vous – carte d'identité",date:now-4*D-1*H,
+  html:`<p>Madame, Monsieur,</p><p>Nous vous confirmons votre rendez-vous pour une demande de carte d'identité le <strong>jeudi 19 novembre à 10h30</strong>, à l'accueil de la mairie.</p><p>Merci d'apporter :</p><ul><li>une photo d'identité récente ;</li><li>un justificatif de domicile de moins d'un an ;</li><li>votre ancienne carte d'identité.</li></ul><p>En cas d'empêchement, merci de nous prévenir par retour de mail.</p><p>Le service État civil<br>Mairie de Bohain-en-Vermandois</p>`,
+  legit:"Ce message est fiable : il confirme un rendez-vous que vous avez pris, il ne demande ni argent ni mot de passe, et ne contient aucun lien pressant."});
+ add({secOnly:true,phishing:true,ex:3,from:{name:'Marie Dupont',email:'marie.dupont.urgent@mail-secours-assistance.com'},subject:"Besoin d'aide urgent, s'il te plaît",date:now-25*M,read:false,
+  html:`<p>Coucou,</p><p>J'ai un gros souci : je suis en voyage et on m'a volé mon sac. Mon téléphone ne marche plus, je ne peux t'écrire que par ici.</p><p>Est-ce que tu pourrais m'acheter <strong>3 cartes cadeaux de 100 €</strong> au bureau de tabac et m'envoyer les codes en répondant à ce message ? Je te rembourse dès mon retour, promis.</p><p>S'il te plaît, n'en parle à personne, j'ai trop honte… Fais vite !</p><p>Marie</p>`,
+  clues:["Le nom affiché est bien « Marie Dupont »… mais l'adresse n'est pas la sienne : marie.dupont.urgent@mail-secours-assistance.com au lieu de marie.dupont@cocotte-mail.fr. N'importe qui peut écrire le nom qu'il veut !","On vous demande de l'argent sous forme de cartes cadeaux : c'est impossible à récupérer, les escrocs adorent.","L'urgence et le secret (« n'en parle à personne », « fais vite ») servent à vous empêcher de vérifier.","Le bon réflexe : contacter Marie par un autre moyen (téléphone, un proche) avant de faire quoi que ce soit."]});
+ add({secOnly:true,phishing:true,ex:4,from:{name:'Service Facturation',email:'relance@energie-plus-factures.com'},subject:'Facture impayée – dernier avis avant poursuites',date:now-1*H-40*M,read:false,
+  html:`<p>Madame, Monsieur,</p><p>Sauf erreur de notre part, votre facture du mois dernier d'un montant de <strong>187,45 €</strong> reste impayée malgré nos relances.</p><p>Vous trouverez le détail dans la pièce jointe. Sans règlement sous <strong>72 heures</strong>, votre dossier sera transmis à notre service contentieux.</p><p>Le service facturation</p>`,
+  attachments:[{name:'Facture_novembre.pdf.exe',size:'412 Ko',type:'doc',danger:true}],
+  clues:["Le nom du fichier se termine par .exe : ce n'est pas un document mais un PROGRAMME. Le « .pdf » au milieu est là pour vous tromper. L'ouvrir pourrait installer un virus sur votre ordinateur.","Vous n'avez sans doute aucun contrat avec cette entreprise : ces messages sont envoyés au hasard.","Le ton menaçant (« poursuites », « 72 heures ») cherche à vous faire paniquer.","« Madame, Monsieur » : ni votre nom, ni un numéro de client.","Une vraie entreprise vous invite à consulter vos factures dans votre espace client, sur son site."]});
+ add({secOnly:true,ex:5,from:{name:'Cocotte Mail – Sécurité',email:'securite@'+DOMAIN},subject:'Protégez votre messagerie en 2 étapes 🔒',date:now-10*M,read:false,
+  html:`<p>Bonjour {prenom},</p><p>Votre mot de passe actuel est <strong>trop faible</strong>. Pour protéger votre messagerie, nous vous conseillons de :</p><ol><li>choisir un <strong>mot de passe solide</strong> (au moins 12 caractères, avec des majuscules, des minuscules, des chiffres et des caractères spéciaux) ;</li><li>activer la <strong>validation en deux étapes</strong> : en plus du mot de passe, un code reçu par SMS vous sera demandé.</li></ol><p>Pour cela, cliquez sur <strong>Paramètres</strong> en haut de l'écran, puis sur <strong>Sécurité du compte</strong>.</p><p>Nous ne vous demanderons <strong>jamais</strong> votre mot de passe par message.</p><p>L'équipe Cocotte Mail</p>`,
+  legit:"Ce message est fiable : il ne contient aucun lien, ne demande pas votre mot de passe et vous invite simplement à aller vous-même dans les paramètres. C'est exactement ce que fait un service sérieux."});
+ // spam
+ add({folder:'spam',from:{name:'Caisse Santé Plus',email:'remboursement@caisse-sante-plus-fr.net'},subject:'Remboursement en attente : 48,70 €',date:now-5*H,read:false,phishing:true,
+  html:`<p>Cher(e) assuré(e),</p><p>Après un dernier calcul, vous avez droit à un remboursement de <strong>48,70 €</strong>. Pour le recevoir, veuillez mettre à jour vos coordonnées bancaires avant le <strong>${new Date(now+2*D).toLocaleDateString('fr-FR')}</strong>.</p><p><a class="trap" data-url="http://caisse-sante-remboursement.online/formulaire">Recevoir mon remboursement</a></p><p>Le service des remboursements</p>`,
+  clues:["Un remboursement « surprise » que vous n'avez pas demandé : c'est un appât classique.","On vous demande vos coordonnées bancaires par un lien : les organismes sérieux ne le font jamais par mail.","« Cher(e) assuré(e) » : le message n'est pas personnalisé.","Le lien mène vers un site inconnu (…remboursement.online).","Une date limite pour vous presser."]});
+ add({folder:'spam',from:{name:'Grand Jeu National',email:'gagnant@super-loterie-mondiale.biz'},subject:'🎉 FÉLICITATIONS, vous avez gagné un smartphone !',date:now-D-9*H,read:false,phishing:true,
+  html:`<p style="font-size:1.4em;font-weight:bold;color:#d81b60">🎁 VOUS ÊTES NOTRE GRAND GAGNANT !!!</p><p>Votre adresse e-mail a été tirée au sort parmi 1 000 000 de participants. Vous remportez un smartphone dernier modèle d'une valeur de 1 299 € !</p><p>Il vous suffit de régler 2 € de frais d'envoi : <a class="trap" data-url="http://super-loterie-mondiale.biz/gagnant/paiement">RÉCUPÉRER MON CADEAU</a></p><p>Offre valable 1 heure seulement !</p>`,
+  clues:["Vous avez « gagné » à un jeu auquel vous n'avez jamais participé.","Trop beau pour être vrai : un smartphone à 1 299 € pour 2 €.","Les majuscules, les points d'exclamation et les émojis servent à vous exciter.","On vous demande de payer, même une petite somme : c'est pour voler votre carte bancaire.","« Valable 1 heure seulement » : encore de la pression."]});
+ add({folder:'spam',from:{name:'Crédit Rapide',email:'offre@credit-rapide-express.biz'},subject:'Crédit immédiat de 5 000 € sans justificatif',date:now-2*D-8*H,read:true,phishing:true,
+  html:`<p>Besoin d'argent rapidement ?</p><p>Obtenez jusqu'à <strong>5 000 €</strong> en 10 minutes, sans justificatif et même si vous êtes fiché à la Banque de France !</p><p><a class="trap" data-url="http://credit-rapide-express.biz/demande">Faire ma demande</a></p>`,
+  clues:["Aucun organisme de crédit sérieux ne prête « sans justificatif » ni « en 10 minutes ».","Ce type d'offre sert à récupérer vos papiers d'identité et vos coordonnées bancaires, ou à vous faire payer des « frais de dossier ».","Le message est envoyé au hasard, sans votre nom.","Adresse et lien inconnus (.biz)."]});
+ // sent, drafts, trash
+ add({folder:'sent',from:{name:S.user.name,email},to:['marie.dupont@'+DOMAIN],subject:'Merci pour le gâteau !',date:now-3*D-2*H,
+  text:"Bonjour Marie,\n\nMerci encore pour ton délicieux gâteau au chocolat. Tu me donneras la recette ?\n\nÀ bientôt !"});
+ add({folder:'drafts',from:{name:S.user.name,email},to:[],subject:"Inscription à l'atelier",date:now-1*D-1*H,text:"Bonjour,\n\nJe souhaiterais m'inscrire à "});
+ add({folder:'trash',prev:'inbox',from:{name:'Chaussettes & Co',email:'promo@chaussettes-co.fr'},subject:'Promo : -50 % sur les chaussettes !',date:now-6*D,
+  html:`<p>Profitez de <strong>-50 %</strong> sur toute notre collection de chaussettes cet hiver ! 🧦</p><p><a class="safe" data-url="https://www.chaussettes-co.fr/promo">Voir la boutique</a></p>`,
+  legit:"C'est une publicité d'une boutique. Ce n'est pas forcément une arnaque, mais vous pouvez la supprimer ou vous désabonner."});
+ add({folder:'spam',from:{name:'Meubles Discount',email:'pub@meubles-discount.fr'},subject:'Soldes : tous nos canapés à -40 %',date:now-7*H,read:false,
+  html:`<p>Cette semaine seulement, profitez de <strong>-40 %</strong> sur tous nos canapés !</p><p>Livraison offerte dès 300 € d'achat.</p>`});
+ add({folder:'spam',from:{name:'Voyages Soleil',email:'promo@voyages-soleil.fr'},subject:'Partez au soleil cet hiver ☀️',date:now-2*D-4*H,
+  html:`<p>Envie de chaleur ? Découvrez nos séjours au soleil à petits prix.</p>`});
+ S.phishTotal=S.messages.filter(m=>m.phishing).length;
+ save();
+}
+
+/* ---------- helpers ---------- */
+function colorFor(s){const C=['#1f4e8c','#b54708','#1e7b45','#7a2e98','#b42318','#0e7490','#9a3412','#4338ca'];let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return C[h%C.length]}
+function initials(n){const p=String(n||'?').replace(/[^\p{L}\p{N}\s]/gu,'').trim().split(/\s+/);return(((p[0]||'?')[0]||'?')+(p[1]?p[1][0]:'')).toUpperCase()}
+const avatar=(name,email,c='')=>`<span class="avatar ${c}" style="background:${colorFor(email||name)}">${esc(initials(name||email))}</span>`;
+function contactOf(a){a=String(a).toLowerCase();return S.contacts.find(c=>c.email.toLowerCase()===a)}
+function nameOf(a){if(String(a).toLowerCase()===me())return 'moi';const c=contactOf(a);return c?c.name:a}
+function plain(m){if(m.text!=null)return m.text;const d=document.createElement('div');d.innerHTML=fill(m.html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|li|div)>/gi,'\n').replace(/<li>/gi,'• ');return d.textContent.replace(/\n{3,}/g,'\n\n').trim()}
+function bodyHtml(m){if(m.html)return fill(m.html);return '<div class="quote">'+esc(m.text||'')+'</div>'}
+function fmtShort(t){const d=new Date(t),n=new Date();if(d.toDateString()===n.toDateString())return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});const y=new Date(n);y.setDate(n.getDate()-1);if(d.toDateString()===y.toDateString())return 'Hier';return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}
+function fmtFull(t){const d=new Date(t);return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+const splitAddr=s=>String(s||'').split(/[,;]+/).map(x=>x.trim()).filter(Boolean);
+const validAddr=a=>/^[^\s@,;<>]+@[^\s@,;<>]+\.[a-z]{2,}$/i.test(a);
+
+/* ---------- apparences ---------- */
+const THEMES={
+ classique:{label:'Classique (Cocotte Mail)',compose:'Nouveau message',f:{inbox:'Boîte de réception',starred:'Favoris',sent:'Envoyés',drafts:'Brouillons',spam:'Indésirables',trash:'Corbeille'}},
+ gmail:{label:'Ressemble à Gmail',compose:'Nouveau message',f:{inbox:'Boîte de réception',starred:'Messages suivis',sent:'Messages envoyés',drafts:'Brouillons',spam:'Spam',trash:'Corbeille'}},
+ outlook:{label:'Ressemble à Outlook',compose:'Nouveau courrier',f:{inbox:'Boîte de réception',starred:'Favoris',sent:'Éléments envoyés',drafts:'Brouillons',spam:'Courrier indésirable',trash:'Éléments supprimés'}},
+ orange:{label:'Ressemble à Mail Orange',compose:'Écrire',f:{inbox:'Boîte de réception',starred:'Favoris',sent:'Envoyés',drafts:'Brouillons',spam:'Indésirables',trash:'Corbeille'}},
+ laposte:{label:'Ressemble à laposte.net',compose:'Écrire',f:{inbox:'Boîte de réception',starred:'Favoris',sent:'Envoyés',drafts:'Brouillons',spam:'Spam',trash:'Corbeille'}}
+};
+const TH=()=>THEMES[(S&&S.theme)||'classique']||THEMES.classique;
+const themeOptions=cur=>Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${k===cur?'selected':''}>${t.label}</option>`).join('');
+function tt(h){return String(h).replace(/\{(sent|drafts|spam|trash|inbox)\}/g,(_,k)=>TH().f[k]).replace(/\{compose\}/g,TH().compose)}
+function folderLabel(f){return f==='contacts'?'Contacts':(TH().f[f]||String(f).slice(2))}
+function inFolder(f){if(f==='starred')return S.messages.filter(m=>m.starred&&m.folder!=='trash');return S.messages.filter(m=>m.folder===f)}
+const unreadIn=f=>inFolder(f).filter(m=>!m.read).length;
+function prefix(p,s){s=String(s||'').replace(/^((re|tr|fwd?)\s*:\s*)+/i,'');return p+' : '+s}
+
+/* ---------- toast / dialog / menus ---------- */
+function toast(msg,action,dur){const t=document.createElement('div');t.className='toast';t.innerHTML=`<span>${msg}</span>`;if(action){const b=document.createElement('button');b.textContent=action.label;b.onclick=()=>{action.fn();t.remove()};t.appendChild(b)}$('#toasts').appendChild(t);setTimeout(()=>t.remove(),dur||(action?7000:3500))}
+function dialog({title,body='',buttons,wide=false}){
+ buttons=buttons||[{label:'OK',value:true,primary:true}];
+ return new Promise(res=>{
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML=`<div class="dlg ${wide?'wide':''}" role="dialog" aria-modal="true" aria-label="${esc(title.replace(/<[^>]+>/g,''))}"><h2>${title}</h2><div class="dlg-body">${body}</div><div class="dlg-btns"></div></div>`;
+  const bx=ov.querySelector('.dlg-btns');
+  const close=v=>{dialog.vals=Object.fromEntries([...ov.querySelectorAll('[name]')].map(i=>[i.name,i.value]));ov.remove();res(v)};
+  buttons.forEach(b=>{const e=document.createElement('button');e.className='btn'+(b.primary?' primary':'')+(b.danger?' danger':'');e.textContent=b.label;e.onclick=()=>close(b.value);bx.appendChild(e)});
+  ov.addEventListener('mousedown',e=>{if(e.target===ov)close(null)});
+  ov.addEventListener('click',e=>{const t=e.target.closest('[data-val]');if(t)close(t.dataset.val)});
+  ov.addEventListener('keydown',e=>{if(e.key==='Escape')close(null);if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();const p=bx.querySelector('.primary');p&&p.click()}});
+  document.body.appendChild(ov);
+  const f=ov.querySelector('input,textarea')||bx.querySelector('.primary')||bx.querySelector('button');f&&f.focus();
+ });
+}
+let popEl=null;
+function closePop(){if(popEl){popEl.remove();popEl=null;document.removeEventListener('mousedown',popOutside)}}
+function popOutside(e){if(popEl&&!popEl.contains(e.target))closePop()}
+function popMenu(anchor,items){
+ closePop();const r=anchor.getBoundingClientRect();const d=document.createElement('div');d.className='pop';
+ d.innerHTML=items.map((it,i)=>it==='-'?'<hr>':`<button data-i="${i}">${it.label}</button>`).join('');
+ document.body.appendChild(d);popEl=d;
+ let left=Math.max(8,Math.min(r.left,innerWidth-d.offsetWidth-8)),top=r.bottom+4;
+ if(top+d.offsetHeight>innerHeight-8)top=Math.max(8,r.top-d.offsetHeight-4);
+ d.style.left=left+'px';d.style.top=top+'px';
+ d.onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const it=items[+b.dataset.i];closePop();it.fn()};
+ setTimeout(()=>document.addEventListener('mousedown',popOutside),0);
+}
+
+/* ---------- rendering ---------- */
+function render(){if(!S)return;renderHeader();renderSide();renderList();renderReader();const u=unreadIn('inbox');document.title=(u?`(${u}) `:'')+"Cocotte Mail – messagerie d'entraînement"}
+function renderHeader(){
+ $('#me').innerHTML=`${avatar(S.user.name,S.user.email)}<div><b>${esc(S.user.name)}</b><small>${esc(S.user.email)}</small></div>`;
+}
+function renderSide(){
+ const items=[['inbox','inbox'],['starred','star'],['sent','send'],['drafts','draft'],['spam','spam'],['trash','trash']];
+ document.body.dataset.theme=(S&&S.theme)||'classique';
+ let h=`<button class="compose-btn" data-act="compose">${ic('pen')} ${TH().compose}</button>`;
+ h+=items.map(([f,i])=>{let n=0,g='';if(f==='inbox'||f==='spam')n=unreadIn(f);if(f==='drafts'){n=inFolder(f).length;g=' grey'}return `<button class="folder ${V.folder===f?'active':''}" data-folder="${f}">${ic(i)}<span>${folderLabel(f)}</span>${n?`<span class="count${g}">${n}</span>`:''}</button>`}).join('');
+ h+=`<h4>Mes dossiers</h4>`+S.folders.map(n=>{const f='f:'+n,u=unreadIn(f);return `<button class="folder ${V.folder===f?'active':''}" data-folder="${esc(f)}">${ic('folder')}<span>${esc(n)}</span>${u?`<span class="count">${u}</span>`:''}</button>`}).join('')+`<button class="folder add" data-act="newfolder">${ic('plus')}<span>Nouveau dossier</span></button>`;
+ h+=`<h4>Carnet d'adresses</h4><button class="folder ${V.folder==='contacts'?'active':''}" data-folder="contacts">${ic('users')}<span>Contacts</span><span class="count grey">${S.contacts.length}</span></button>`;
+ if(sec()){const ex=S.ex||{};h+=`<h4>Exercices sécurité</h4>`+EX.map((x,i)=>{const n=i+1,d=ex[n];return `<button class="folder exo ${d?'done':''}" data-ex="${n}"><span class="exn">${d?'✔':n}</span><span>${x.t}</span></button>`}).join('')}
+ if(!sec()){const mi=S.mi||{};h+=`<h4>Missions de l'atelier</h4>`+MI.map((x,i)=>{const n=i+1,d=mi[n];return `<button class="folder exo ${d?'done':''}" data-mi="${n}"><span class="exn">${d?'✔':n}</span><span>${x.t}</span></button>`}).join('')+`<button class="folder exo ${mi.defi?'done':''}" data-mi="defi"><span class="exn">${mi.defi?'✔':'🏁'}</span><span>Défi final</span></button>`}
+ if(sec()&&S.phishTotal)h+=`<div class="score">${ic('shield')}<span>Arnaques repérées :<br><b>${S.found.length} sur ${S.phishTotal}</b></span></div>`;
+ $('#side').innerHTML=h;
+}
+function listMsgs(){
+ let a;
+ if(V.q){const q=norm(V.q);a=S.messages.filter(m=>(m.folder!=='trash'&&m.folder!=='spam')||m.folder===V.folder).filter(m=>norm([m.subject,m.from.name,m.from.email,(m.to||[]).join(' '),plain(m)].join(' ')).includes(q))}
+ else a=inFolder(V.folder);
+ return a.slice().sort((x,y)=>y.date-x.date);
+}
+function rowHtml(m){
+ const mine=m.folder==='sent'||m.folder==='drafts';
+ const who=mine?('À : '+(m.to.length?m.to.map(nameOf).join(', '):'(pas de destinataire)')):(m.from.name||m.from.email);
+ const snip=plain(m).replace(/\s+/g,' ').slice(0,100);
+ const ck=V.checked.has(m.id);
+ return `<div class="row ${m.read?'':'unread'} ${V.sel===m.id?'sel':''} ${ck?'checked':''}" data-id="${m.id}" tabindex="0" role="button" aria-label="${esc((m.read?'':'Non lu. ')+who+'. '+(m.subject||'sans objet'))}">
+ <input type="checkbox" class="chk" data-chk="${m.id}" ${ck?'checked':''} aria-label="Sélectionner ce message" title="Sélectionner">
+ <button class="star ${m.starred?'on':''}" data-star="${m.id}" title="${m.starred?'Retirer des favoris':'Ajouter aux favoris'}" aria-label="Favori">${ic('star')}</button>
+ <div class="r-main"><div class="r-top"><span class="r-from">${m.folder==='drafts'?'<span class="draftlbl">Brouillon</span> · ':''}${esc(who)}</span><span class="r-date">${fmtShort(m.date)}</span></div>
+ <div class="r-sub"><span>${esc(m.subject||'(sans objet)')}</span>${m.attachments.length?ic('clip','sm'):''}</div>
+ <div class="r-snip">${esc(snip)||'&nbsp;'}</div>${V.q?`<span class="ftag">${esc(folderLabel(m.folder))}</span>`:''}</div></div>`;
+}
+function renderList(){
+ const el=$('#list');
+ if(V.folder==='contacts'){
+  const cs=S.contacts.slice().sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+  el.innerHTML=`<div class="l-head"><h2>Contacts</h2><span class="mut">${cs.length}</span><span class="sp"></span><button class="tbtn primary" data-act="addcontact">${ic('userplus')}<span>Ajouter</span></button></div><div class="hint">Enregistrez ici les adresses de vos proches pour ne plus avoir à les retenir.</div><div class="rows">`+
+   cs.map(c=>`<div class="row ${V.contact===c.email?'sel':''}" data-contact="${esc(c.email)}" tabindex="0" role="button" style="grid-template-columns:auto 1fr;align-items:center">${avatar(c.name,c.email)}<div class="r-main"><div class="r-from"><b>${esc(c.name)}</b></div><div class="r-snip">${esc(c.email)}</div></div></div>`).join('')+`</div>`;
+  return;
+ }
+ const msgs=listMsgs();
+ let tools='';
+ if(!V.q){
+  if(V.folder==='trash'&&msgs.length)tools=`<button class="link" data-act="emptytrash">Vider la corbeille</button>`;
+  if(V.folder==='spam'&&msgs.length)tools=`<button class="link" data-act="emptyspam">Tout supprimer</button>`;
+  if(V.folder.startsWith('f:'))tools=`<button class="link" data-act="delfolder">Supprimer ce dossier</button>`;
+ }
+ const all=msgs.length>0&&msgs.every(m=>V.checked.has(m.id));
+ let head;
+ if(V.checked.size){
+  const n=V.checked.size;
+  head=`<div class="l-head bulk"><input type="checkbox" class="chk" id="chkAll" ${all?'checked':''} aria-label="Tout sélectionner" title="Tout sélectionner"><b>${n} sélectionné${n>1?'s':''}</b><span class="sp"></span>
+  <button class="tbtn" data-act="b-del" title="Supprimer">${ic('trash')}<span>Supprimer</span></button>
+  <button class="tbtn" data-act="b-move" title="Déplacer">${ic('folder')}<span>Déplacer</span></button>
+  <button class="tbtn" data-act="b-read" title="Marquer comme lu">${ic('mailopen')}<span>Lu</span></button>
+  <button class="tbtn" data-act="b-unread" title="Marquer comme non lu">${ic('mail')}<span>Non lu</span></button>
+  <button class="iconbtn" data-act="b-clear" title="Annuler la sélection" aria-label="Annuler la sélection">${ic('x')}</button></div>`;
+ }else{
+  head=`<div class="l-head"><input type="checkbox" class="chk" id="chkAll" aria-label="Tout sélectionner" title="Tout sélectionner" ${msgs.length?'':'disabled'}><h2>${V.q?`Résultats pour « ${esc(V.q)} »`:esc(folderLabel(V.folder))}</h2><span class="mut">${msgs.length}</span><span class="sp"></span>${tools}${V.q?`<button class="link" data-act="clearq">Effacer la recherche</button>`:''}</div>`;
+ }
+ const hints={trash:'Les messages supprimés arrivent ici. Vous pouvez encore les restaurer.',spam:sec()?'Les messages publicitaires ou suspects arrivent ici. Ne cliquez pas sur leurs liens !':'Les publicités et les messages non désirés sont rangés ici automatiquement.',drafts:'Les messages commencés mais pas encore envoyés. Cliquez dessus pour les reprendre.',sent:'Tous les messages que vous avez envoyés.',starred:'Les messages marqués d\'une étoile, pour les retrouver facilement.'};
+ const hint=!V.q&&hints[V.folder]?`<div class="hint">${hints[V.folder]}</div>`:'';
+ el.innerHTML=head+hint+(msgs.length?`<div class="rows">${msgs.map(rowHtml).join('')}</div>`:`<div class="empty-list">${ic(V.q?'search':'inbox','xl')}<p>${V.q?'Aucun message ne correspond à votre recherche.':'Aucun message dans ce dossier.'}</p></div>`);
+}
+function recipients(m){const s=new Set([m.from.email,...m.to,...m.cc].map(a=>a.toLowerCase()));s.delete(me());return s}
+function renderReader(){
+ const el=$('#reader');
+ if(V.folder==='contacts'){
+  const c=V.contact&&contactOf(V.contact);
+  if(!c){el.innerHTML=`<div class="r-empty">${ic('users','xl')}<p>Cliquez sur un contact pour voir sa fiche.</p></div>`;return}
+  el.innerHTML=`<div class="r-bar"><button class="tbtn mob-back" data-act="back">${ic('back')}<span>Retour</span></button></div><div class="r-scroll"><div class="contact-card">${avatar(c.name,c.email,'lg')}<h2>${esc(c.name)}</h2><div class="addr">${esc(c.email)}</div><div class="btns"><button class="tbtn primary" data-act="writecontact">${ic('pen')}<span>Écrire un message</span></button><button class="tbtn" data-act="editcontact">${ic('pen')}<span>Modifier</span></button><button class="tbtn danger" data-act="delcontact">${ic('trash')}<span>Supprimer</span></button></div></div></div>`;
+  return;
+ }
+ const m=V.sel!=null&&byId(V.sel);
+ if(!m){el.innerHTML=`<div class="r-empty">${ic('mail','xl')}<p>Cliquez sur un message dans la liste pour le lire.</p></div>`;document.body.classList.remove('reading');return}
+ const f=m.folder,mineMsg=m.from.email.toLowerCase()===me();
+ const B=(a,i,l,c='')=>`<button class="tbtn ${c}" data-act="${a}" title="${l}">${ic(i)}<span>${l}</span></button>`;
+ let bar=`<button class="tbtn mob-back" data-act="back">${ic('back')}<span>Retour</span></button>`;
+ if(f==='trash')bar+=B('restore','restore','Restaurer')+B('purge','trash','Supprimer définitivement','danger');
+ else if(f==='spam')bar+=B('notspam','inbox',"Ce n'est pas un spam")+(sec()?B('report','shield','Signaler une arnaque'):'')+B('del','trash','Supprimer','danger');
+ else{
+  if(f!=='sent')bar+=B('reply','reply','Répondre');
+  if(f!=='sent'&&recipients(m).size>1)bar+=B('replyall','replyall','Répondre à tous');
+  bar+=B('fwd','forward','Transférer')+'<span class="sep"></span>'+B('del','trash','Supprimer')+B('move','folder','Déplacer');
+  if(f!=='sent')bar+=B('unread','mail','Marquer non lu');
+  if(!mineMsg&&sec())bar+=B('report','shield','Signaler une arnaque');
+ }
+ const toLine=m.to.length?m.to.map(a=>`<span title="${esc(a)}">${esc(nameOf(a))}</span>`).join(', '):'—';
+ const known=contactOf(m.from.email);
+ let banner='';
+ if(f==='spam')banner=`<div class="inbanner warn">${ic('spam')}<span>${sec()?"Ce message a été classé dans les <b>indésirables</b>. Soyez prudent : ne cliquez pas sur ses liens et n'ouvrez pas ses pièces jointes.":"Ce message a été rangé automatiquement dans les <b>indésirables</b> (publicités, messages non désirés). S'il vous intéresse, cliquez sur « Ce n'est pas un spam »."}</span></div>`;
+ else if(f==='trash')banner=`<div class="inbanner info">${ic('trash')}<span>Ce message est dans la corbeille. Cliquez sur « Restaurer » pour le remettre à sa place.</span></div>`;
+ const atts=m.attachments.length?`<div class="atts"><b>${ic('clip')} ${m.attachments.length} pièce${m.attachments.length>1?'s':''} jointe${m.attachments.length>1?'s':''}</b><div class="attlist">${m.attachments.map((a,i)=>attCard(a,i)).join('')}</div></div>`:'';
+ const quick=(f==='trash'||f==='spam')?'':`<div class="quick">${f!=='sent'?B('reply','reply','Répondre'):''}${f!=='sent'&&recipients(m).size>1?B('replyall','replyall','Répondre à tous'):''}${B('fwd','forward','Transférer')}</div>`;
+ el.innerHTML=`<div class="r-bar">${bar}<span class="sp" style="flex:1"></span><button class="star ${m.starred?'on':''}" data-star="${m.id}" title="${m.starred?'Retirer des favoris':'Ajouter aux favoris'}" aria-label="Favori" style="font-size:1.2rem">${ic('star')}</button></div>
+ <div class="r-scroll"><h1 class="subj">${esc(m.subject||'(sans objet)')}</h1>${banner}
+ <div class="mhdr">${avatar(m.from.name,m.from.email)}<div class="mhdr-info"><div><b>${esc(mineMsg?'Moi ('+S.user.name+')':(m.from.name||m.from.email))}</b> <span class="addr">&lt;${esc(m.from.email)}&gt;</span> ${!known&&!mineMsg&&!m.bounce?`<button class="link" data-act="addsender">${ic('userplus','sm')} Ajouter aux contacts</button>`:''}</div>
+ <div class="mut">À : ${toLine}</div>${m.cc.length?`<div class="mut">Cc : ${m.cc.map(a=>esc(nameOf(a))).join(', ')}</div>`:''}${mineMsg&&m.bcc&&m.bcc.length?`<div class="mut">Cci : ${m.bcc.map(a=>esc(nameOf(a))).join(', ')}</div>`:''}</div>
+ <div class="mut date">${fmtFull(m.date)}</div></div>
+ <div class="mbody">${bodyHtml(m)}</div>${atts}${quick}</div>`;
+}
+function attCard(a,i){
+ const e=ext(a.name);
+ const th=a.type==='image'&&a.data?`<img src="${esc(a.data)}" alt="">`:`<span class="thumb" style="background:${EXTCOL[e]||'#607080'}">${esc(e.toUpperCase()||'FICHIER')}</span>`;
+ return `<button class="att" data-att="${i}" title="Ouvrir ${esc(a.name)}">${th}<span class="att-n">${esc(a.name)}</span><small>${esc(a.size||'')}</small></button>`;
+}
+
+/* ---------- message actions ---------- */
+function openMsg(id){
+ const m=byId(id);if(!m)return;
+ onOpen(m);
+ if(m.folder==='drafts'){openCompose({draftId:m.id,to:m.to.join(', '),cc:m.cc.join(', '),bcc:(m.bcc||[]).join(', '),subject:m.subject,text:m.text!=null?m.text:plain(m),attachments:m.attachments,title:'Brouillon'});return}
+ m.read=true;V.sel=id;document.body.classList.add('reading');save();render();
+ const sc=$('#reader .r-scroll');if(sc)sc.scrollTop=0;
+}
+function delMsgs(ids){
+ const ms=ids.map(byId).filter(Boolean);if(!ms.length)return;
+ if(ms.every(m=>m.folder==='trash')){purge(ids);return}
+ ms.forEach(m=>{if(m.folder!=='trash'){m.prev=m.folder;m.folder='trash'}});
+ if(ids.includes(V.sel)){V.sel=null;document.body.classList.remove('reading')}
+ V.checked.clear();save();render();
+ toast(ms.length>1?`${ms.length} messages mis à la corbeille`:'Message mis à la corbeille',{label:'Annuler',fn:()=>{ms.forEach(m=>{m.folder=m.prev||'inbox'});save();render()}});
+}
+async function purge(ids){
+ const n=ids.length;
+ const ok=await dialog({title:'Supprimer définitivement ?',body:`<p>${n>1?`Ces ${n} messages seront effacés`:'Ce message sera effacé'} pour toujours. Vous ne pourrez plus ${n>1?'les':'le'} récupérer.</p>`,buttons:[{label:'Annuler',value:false},{label:'Supprimer définitivement',value:true,danger:true}]});
+ if(!ok)return;
+ S.messages=S.messages.filter(m=>!ids.includes(m.id));
+ if(ids.includes(V.sel)){V.sel=null;document.body.classList.remove('reading')}
+ V.checked.clear();save();render();toast(n>1?`${n} messages supprimés`:'Message supprimé');
+}
+function moveTo(ids,folder){
+ ids.map(byId).filter(Boolean).forEach(m=>{m.folder=folder});
+ if(ids.includes(V.sel)&&V.folder!=='starred'&&!V.q){V.sel=null;document.body.classList.remove('reading')}
+ V.checked.clear();save();render();toast(`Déplacé dans « ${esc(folderLabel(folder))} »`);
+}
+function moveMenu(anchor,ids){
+ const cur=ids.length===1?byId(ids[0]).folder:null;
+ const targets=['inbox',...S.folders.map(n=>'f:'+n)].filter(f=>f!==cur);
+ const items=targets.map(f=>({label:ic(f==='inbox'?'inbox':'folder')+' '+esc(folderLabel(f)),fn:()=>moveTo(ids,f)}));
+ if(items.length)items.push('-');
+ items.push({label:ic('plus')+' Nouveau dossier…',fn:async()=>{const n=await newFolder();if(n)moveTo(ids,'f:'+n)}});
+ popMenu(anchor,items);
+}
+async function newFolder(){
+ const r=await dialog({title:'Créer un dossier',body:`<p>Les dossiers servent à ranger vos messages (par exemple : Famille, Factures, Santé…).</p><label for="nf">Nom du dossier</label><input class="field" id="nf" name="nf" maxlength="30" placeholder="Ex. : Famille">`,buttons:[{label:'Annuler',value:false},{label:'Créer',value:true,primary:true}]});
+ if(!r)return null;
+ const n=(dialog.vals.nf||'').trim();
+ if(!n){toast('Le nom du dossier est vide');return null}
+ if(S.folders.some(x=>x.toLowerCase()===n.toLowerCase())){toast('Ce dossier existe déjà');return n}
+ S.folders.push(n);save();renderSide();toast(`Dossier « ${esc(n)} » créé`);return n;
+}
+async function report(m){
+ if(m.phishing){
+  if(!S.found.includes(m.id))S.found.push(m.id);
+  const moved=m.folder!=='spam';
+  if(moved){m.prev=m.folder;m.folder='spam';V.sel=null;document.body.classList.remove('reading')}
+  save();render();
+  await dialog({title:'Bien vu ! 🛡️',wide:true,body:`<p class="okbox">C'était bien une <b>tentative d'arnaque</b> (on parle d'« hameçonnage »).${moved?' Le message a été déplacé dans les indésirables.':''}</p><p><b>Les indices qui le prouvent :</b></p><ul>${m.clues.map(c=>`<li>${esc(c)}</li>`).join('')}</ul><p class="mut">Dans la vraie vie, vous pouvez aussi signaler ce type de message sur signal-spam.fr.</p>`,buttons:[{label:'Super, compris !',value:true,primary:true}]});
+  if(m.ex)completeEx(m.ex);
+ }else{
+  const r=await dialog({title:'Ce message semble fiable',body:`<p>${esc(m.legit||"Ce message ne présente pas les signes habituels d'une arnaque : il ne réclame ni argent ni mot de passe et ne vous met pas la pression.")}</p><p class="mut">Vous pouvez quand même le ranger dans les indésirables si vous ne voulez plus le voir.</p>`,buttons:[{label:'Le déplacer dans Indésirables',value:true},{label:'Le garder',value:false,primary:true}]});
+  if(r){m.prev=m.folder;moveTo([m.id],'spam')}
+ }
+}
+async function notSpam(m){
+ if(m.phishing){
+  const r=await dialog({title:'⚠️ Attention, ce message est une arnaque',wide:true,body:`<p class="alertbox">Ce message a été classé dans les indésirables pour une bonne raison.</p><p><b>Les indices :</b></p><ul>${m.clues.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`,buttons:[{label:'Le déplacer quand même',value:true},{label:'Le laisser dans les indésirables',value:false,primary:true}]});
+  if(!r){if(!S.found.includes(m.id)){S.found.push(m.id);save();renderSide()}return}
+ }
+ moveTo([m.id],m.prev&&m.prev!=='spam'&&m.prev!=='trash'?m.prev:'inbox');
+}
+function trapDialog(m){
+ dialog({title:'⚠️ Attention : lien piégé !',wide:true,body:`<p class="alertbox">Vous venez de cliquer sur un lien envoyé par des escrocs. Dans la vraie vie, il vous aurait emmené vers un <b>faux site</b> conçu pour voler vos informations (mot de passe, carte bancaire…).</p>${m&&m.clues?`<p><b>Les indices qui auraient dû vous alerter :</b></p><ul>${m.clues.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`:''}<p><b>Si cela vous arrive pour de vrai :</b> ne remplissez rien et fermez la page. Si vous avez déjà donné des informations, changez votre mot de passe et appelez votre banque.</p>`,buttons:[{label:"J'ai compris",value:true,primary:true}]});
+}
+async function openAtt(m,i){
+ const a=m.attachments[i];if(!a)return;
+ if(m.k==='marie')doneMi(5);
+ if(a.danger){await dialog({title:'⚠️ Fichier dangereux !',wide:true,body:`<p class="alertbox">« ${esc(a.name)} » n'est pas un document : son nom se termine par <b>.exe</b>, c'est un <b>programme</b>. Dans la vraie vie, l'ouvrir aurait pu installer un virus ou un logiciel espion sur votre ordinateur.</p><p><b>Le bon réflexe :</b> ne jamais ouvrir une pièce jointe que l'on n'attendait pas, surtout si son nom se termine par .exe, .zip, .scr, ou s'il contient deux extensions (comme .pdf.exe).</p><p class="mut">Vous pouvez maintenant signaler ce message comme arnaque.</p>`,buttons:[{label:"J'ai compris",value:true,primary:true}]});return}
+ let body;
+ if(a.type==='image'&&a.data)body=`<img class="preview-img" src="${esc(a.data)}" alt="${esc(a.name)}">`;
+ else if(a.preview)body=`<div class="docpage">${esc(a.preview)}</div>`;
+ else body=`<p class="mut">L'aperçu de ce fichier n'est pas disponible dans l'atelier.</p>`;
+ const warn=m.folder==='spam'||m.phishing?`<p class="alertbox">Ce message est suspect : dans la vraie vie, n'ouvrez jamais sa pièce jointe !</p>`:'';
+ const r=await dialog({title:esc(a.name),wide:true,body:warn+body+`<p class="mut" style="margin-top:.8rem">${esc(a.size||'')}</p>`,buttons:[{label:'Télécharger',value:'dl'},{label:'Fermer',value:false,primary:true}]});
+ if(r==='dl')toast(`Téléchargement simulé : « ${esc(a.name)} » serait enregistré dans votre dossier Téléchargements.`);
+}
+
+/* ---------- compose ---------- */
+let C=null;
+function sigBlock(){return S.user.signature?'\n\n'+S.user.signature:''}
+function quote(m){return `\n\nLe ${fmtFull(m.date)}, ${m.from.name||m.from.email} <${m.from.email}> a écrit :\n`+plain(m).split('\n').map(l=>'> '+l).join('\n')}
+function reply(m,all){
+ const mm=me(),fromMe=m.from.email.toLowerCase()===mm;
+ let to=fromMe?m.to.slice():[m.from.email],cc=[];
+ if(all){const fl=m.from.email.toLowerCase();to=to.concat(m.to.filter(a=>a.toLowerCase()!==mm&&a.toLowerCase()!==fl&&!to.includes(a)));cc=m.cc.filter(a=>a.toLowerCase()!==mm)}
+ openCompose({to:to.join(', '),cc:cc.join(', '),subject:prefix('RE',m.subject),text:'\n'+sigBlock()+quote(m),title:all?'Répondre à tous':'Répondre',focus:'body',kind:all?'replyall':'reply',src:m.id});
+}
+function forward(m){
+ openCompose({subject:prefix('TR',m.subject),text:'\n'+sigBlock()+`\n\n---------- Message transféré ----------\nDe : ${m.from.name||''} <${m.from.email}>\nDate : ${fmtFull(m.date)}\nObjet : ${m.subject||''}\nÀ : ${m.to.join(', ')}\n\n`+plain(m),attachments:m.attachments,title:'Transférer',focus:'to',kind:'fwd',src:m.id});
+}
+function openCompose(p={}){
+ if(C&&C.dirty)saveDraft(true);
+ C={draftId:p.draftId||null,to:p.to||'',cc:p.cc||'',bcc:p.bcc||'',subject:p.subject||'',text:p.text!=null?p.text:sigBlock(),atts:(p.attachments||[]).map(a=>Object.assign({},a)),showCc:!!(p.cc||p.bcc),dirty:false,title:p.title||TH().compose,focus:p.focus||'to',kind:p.kind||(p.draftId?'draft':'new'),src:p.src||null};
+ closeDrawer();renderCompose();
+}
+function renderCompose(){
+ const root=$('#composeRoot');
+ if(!C){root.innerHTML='';return}
+ root.innerHTML=`<div class="compose" role="dialog" aria-label="${esc(C.title)}">
+ <div class="c-head"><span>${esc(C.title)}</span><button class="iconbtn" data-c="close" title="Fermer" aria-label="Fermer">${ic('x')}</button></div>
+ <div class="c-row"><label for="cTo">À</label><div class="ac"><input id="cTo" autocomplete="off" spellcheck="false" placeholder="Adresse du destinataire, ou tapez un nom"><div class="sugg" hidden></div></div><button class="link" data-c="cc" title="Ajouter des destinataires en copie">Cc / Cci</button></div>
+ <div class="c-row ccrow" ${C.showCc?'':'hidden'}><label for="cCc">Cc</label><div class="ac"><input id="cCc" autocomplete="off" spellcheck="false"><div class="sugg" hidden></div></div><span class="help">copie visible par tous</span></div>
+ <div class="c-row ccrow" ${C.showCc?'':'hidden'}><label for="cBcc">Cci</label><div class="ac"><input id="cBcc" autocomplete="off" spellcheck="false"><div class="sugg" hidden></div></div><span class="help">copie cachée</span></div>
+ <div class="c-row"><label for="cSub">Objet</label><input id="cSub" placeholder="De quoi parle votre message ?"></div>
+ <textarea id="cBody" aria-label="Texte du message" placeholder="Écrivez votre message ici…"></textarea>
+ <div class="c-atts" id="cAtts"></div>
+ <div class="c-foot"><button class="btn primary" data-c="send">${ic('send')} Envoyer</button><button class="btn" data-c="attach">${ic('clip')} Joindre un fichier</button><span class="sp"></span><button class="btn" data-c="draft" title="Enregistrer dans les brouillons">Enregistrer</button><button class="iconbtn" data-c="discard" title="Supprimer ce message" aria-label="Supprimer ce message" style="color:var(--red)">${ic('trash')}</button></div>
+ <input type="file" id="cFile" multiple hidden></div>`;
+ $('#cTo').value=C.to;$('#cCc').value=C.cc;$('#cBcc').value=C.bcc;$('#cSub').value=C.subject;$('#cBody').value=C.text;
+ ['#cTo','#cCc','#cBcc','#cSub','#cBody'].forEach(s=>$(s).addEventListener('input',()=>{C.dirty=true}));
+ ['#cTo','#cCc','#cBcc'].forEach(s=>bindAC($(s)));
+ $('#cFile').addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});
+ renderAtts();
+ if(C.focus==='body'){const b=$('#cBody');b.focus();b.setSelectionRange(0,0);b.scrollTop=0}else $('#cTo').focus();
+}
+function readFields(){if(!C||!$('#cTo'))return;C.to=$('#cTo').value;C.cc=$('#cCc').value;C.bcc=$('#cBcc').value;C.subject=$('#cSub').value;C.text=$('#cBody').value}
+function renderAtts(){const el=$('#cAtts');if(!el)return;el.innerHTML=C.atts.map((a,i)=>`<span class="chip">${ic('clip','sm')} ${esc(a.name)} <small class="mut">${esc(a.size||'')}</small><button data-rmatt="${i}" title="Retirer la pièce jointe" aria-label="Retirer ${esc(a.name)}">${ic('x','sm')}</button></span>`).join('')}
+function fmtSize(b){if(b<1024)return b+' o';if(b<1048576)return Math.round(b/1024)+' Ko';return(b/1048576).toFixed(1).replace('.',',')+' Mo'}
+function addFiles(list){
+ [...list].forEach(f=>{
+  const a={name:f.name,size:fmtSize(f.size),type:f.type.startsWith('image/')?'image':'doc',user:true};
+  if(f.size>10*1048576){dialog({title:'Fichier trop lourd',body:`<p>« ${esc(f.name)} » pèse ${fmtSize(f.size)}. La plupart des messageries refusent les pièces jointes de plus de 10 à 25 Mo.</p><p>Pour les gros fichiers, on utilise plutôt un service d'envoi de fichiers.</p>`});return}
+  C.atts.push(a);C.dirty=true;renderAtts();
+  if(a.type==='image'&&f.size<1.5*1048576){const r=new FileReader();r.onload=()=>{a.data=r.result};r.readAsDataURL(f)}
+  else if(/^text\//.test(f.type)&&f.size<200000){const r=new FileReader();r.onload=()=>{a.preview=String(r.result).slice(0,5000)};r.readAsText(f)}
+ });
+ toast('Pièce jointe ajoutée');
+}
+async function pickDoc(){
+ const v=await dialog({title:'Mes documents',body:`<p class="mut">Choisissez un fichier à joindre :</p>`+MYDOCS.map((d,i)=>`<button class="docpick" data-val="${i}"><span class="thumb" style="background:${EXTCOL[ext(d.name)]||'#607080'}">${d.type==='image'?`<img src="${esc(d.data)}" alt="">`:esc(ext(d.name).toUpperCase())}</span><span><b>${esc(d.name)}</b><br><small class="mut">${esc(d.size)}</small></span></button>`).join(''),buttons:[{label:'Annuler',value:null}]});
+ if(v==null||v===false||!MYDOCS[+v])return;
+ C.atts.push(Object.assign({},MYDOCS[+v]));C.dirty=true;renderAtts();toast('Pièce jointe ajoutée');
+}
+function bindAC(inp){
+ const box=inp.nextElementSibling;
+ const upd=()=>{const parts=inp.value.split(/[,;]/);const last=norm(parts[parts.length-1].trim());if(!last){box.hidden=true;return}
+  const list=S.contacts.filter(c=>norm(c.name).includes(last)||c.email.toLowerCase().includes(last)).slice(0,6);
+  if(!list.length){box.hidden=true;return}
+  box.innerHTML=list.map(c=>`<button type="button" data-em="${esc(c.email)}">${avatar(c.name,c.email,'sm')}<span><b>${esc(c.name)}</b><br><small>${esc(c.email)}</small></span></button>`).join('');box.hidden=false};
+ inp.addEventListener('input',upd);
+ inp.addEventListener('blur',()=>setTimeout(()=>{box.hidden=true},150));
+ inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!box.hidden){const b=box.querySelector('[data-em]');if(b){e.preventDefault();pick(b.dataset.em)}}if(e.key==='Escape')box.hidden=true});
+ const pick=em=>{const parts=inp.value.split(/[,;]/);parts[parts.length-1]=em;inp.value=parts.map(s=>s.trim()).filter(Boolean).join(', ')+', ';box.hidden=true;C.dirty=true;inp.focus()};
+ box.addEventListener('mousedown',e=>{const b=e.target.closest('[data-em]');if(!b)return;e.preventDefault();pick(b.dataset.em)});
+}
+function badReason(a){
+ if(!a.includes('@'))return "il manque l'arobase @";
+ if((a.match(/@/g)||[]).length>1)return "il y a plusieurs @ (une adresse n'en contient qu'un seul)";
+ if(/\s/.test(a))return "il ne doit pas y avoir d'espace";
+ const d=a.split('@')[1]||'';
+ if(!d)return "il manque la partie après le @ (le fournisseur, par exemple cocotte-mail.fr)";
+ if(!/\.[a-z]{2,}$/i.test(d))return "il manque la fin de l'adresse, après un point (par exemple .fr ou .com)";
+ if(!a.split('@')[0])return "il manque la partie avant le @";
+ return "l'adresse contient des caractères non autorisés";
+}
+async function sendMail(){
+ readFields();
+ const to=splitAddr(C.to),cc=splitAddr(C.cc),bcc=splitAddr(C.bcc);
+ if(!to.length&&!cc.length&&!bcc.length){await dialog({title:'À qui envoyer ?',body:"<p>Indiquez au moins une adresse dans le champ <b>À</b>.</p><p class='mut'>Astuce : si la personne est dans vos contacts, tapez le début de son nom et choisissez-la dans la liste.</p>"});$('#cTo')&&$('#cTo').focus();return}
+ const bad=[...to,...cc,...bcc].filter(a=>!validAddr(a));
+ if(bad.length){await dialog({title:'Adresse incorrecte',body:`<p>${bad.length>1?'Ces adresses ne sont pas valides':"Cette adresse n'est pas valide"} :</p><ul>${bad.map(a=>`<li><b>${esc(a)}</b> : ${badReason(a)}</li>`).join('')}</ul><p>Une adresse s'écrit toujours comme ceci : <b>prenom.nom@fournisseur.fr</b></p>${bad.some(a=>!a.includes('@'))?"<p class='mut'>Si c'est le nom d'un contact, tapez le début de son nom puis cliquez dessus dans la liste qui apparaît.</p>":''}`});return}
+ if(!C.subject.trim()){const r=await dialog({title:'Message sans objet',body:"<p>Votre message n'a pas d'<b>objet</b>. L'objet aide votre correspondant à savoir tout de suite de quoi parle le message.</p><p>Voulez-vous l'envoyer quand même ?</p>",buttons:[{label:'Envoyer sans objet',value:true},{label:'Ajouter un objet',value:false,primary:true}]});if(!r){$('#cSub')&&$('#cSub').focus();return}}
+ const m={id:S.nextId++,folder:'sent',from:{name:S.user.name,email:S.user.email},to,cc,bcc,subject:C.subject.trim(),text:C.text,date:Date.now(),read:true,starred:false,attachments:C.atts};
+ const info={kind:C.kind,src:C.src!=null?byId(C.src):null,to,cc,bcc,subject:m.subject,atts:(C.atts||[]).length};
+ if(C.draftId)S.messages=S.messages.filter(x=>x.id!==C.draftId);
+ S.messages.push(m);C=null;renderCompose();save();render();
+ toast('Message envoyé ✔',{label:'Voir',fn:()=>{V.folder='sent';V.q='';$('#q').value='';V.checked.clear();openMsg(m.id)}});
+ simulate(m);
+ onSent(info);
+}
+function saveDraft(silent){
+ readFields();
+ const d={folder:'drafts',from:{name:S.user.name,email:S.user.email},to:splitAddr(C.to),cc:splitAddr(C.cc),bcc:splitAddr(C.bcc),subject:C.subject,text:C.text,date:Date.now(),read:true,starred:false,attachments:C.atts.map(a=>Object.assign({},a))};
+ const x=C.draftId&&byId(C.draftId);
+ if(x)Object.assign(x,d);else{d.id=S.nextId++;S.messages.push(d);C.draftId=d.id}
+ C.dirty=false;save();render();if(!silent)toast('Brouillon enregistré dans « Brouillons »');
+}
+async function closeCompose(){
+ readFields();
+ if(C.dirty){
+  const r=await dialog({title:'Fermer le message ?',body:"<p>Vous n'avez pas envoyé ce message. Que voulez-vous faire ?</p>",buttons:[{label:'Continuer à écrire',value:'stay'},{label:'Supprimer',value:'del',danger:true},{label:'Enregistrer le brouillon',value:'save',primary:true}]});
+  if(!r||r==='stay')return;
+  if(r==='save')saveDraft(false);
+  if(r==='del'&&C.draftId){const x=byId(C.draftId);if(x){x.prev='drafts';x.folder='trash'}save();render()}
+ }
+ C=null;renderCompose();
+}
+async function discardCompose(){
+ const r=await dialog({title:'Supprimer ce message ?',body:"<p>Le message en cours d'écriture sera supprimé.</p>",buttons:[{label:'Annuler',value:false},{label:'Supprimer',value:true,danger:true}]});
+ if(!r)return;
+ if(C.draftId){const x=byId(C.draftId);if(x){x.prev='drafts';x.folder='trash'}save();render()}
+ C=null;renderCompose();toast('Message supprimé');
+}
+
+/* ---------- simulation of replies ---------- */
+function classify(a){
+ const mm=me();if(a===mm)return{type:'self'};
+ const c=contactOf(a);if(c)return c.sim?{type:'contact',c}:{type:'external'};
+ let best=null,bd=99;for(const x of [...S.contacts.map(c=>c.email.toLowerCase()),mm]){const d=lev(a,x);if(d<bd){bd=d;best=x}}
+ if(bd<=3)return{type:'bounce',suggest:best};
+ const dom=a.split('@')[1]||'';const known=[...new Set([DOMAIN,...S.contacts.map(c=>c.email.split('@')[1].toLowerCase())])];
+ if(!known.includes(dom)&&known.some(k=>lev(dom,k)<=2))return{type:'bounce',suggest:null};
+ return{type:'external'};
+}
+function deliver(ref,o){
+ if(S!==ref)return;
+ const m=Object.assign({id:S.nextId++,folder:'inbox',to:[S.user.email],cc:[],bcc:[],read:false,starred:false,attachments:[],date:Date.now()},o);
+ S.messages.push(m);save();render();
+ toast(`📩 Nouveau message de <b>${esc(m.from.name||m.from.email)}</b>`,{label:'Lire',fn:()=>{V.folder='inbox';V.q='';$('#q').value='';V.checked.clear();openMsg(m.id)}});
+}
+function makeReply(c,sent){
+ const first=S.user.first;
+ if(c.auto)return{from:{name:c.name,email:c.email},subject:'Réponse automatique : '+(sent.subject||'(sans objet)'),text:c.auto};
+ const v=!!c.vous,hasAtt=sent.attachments.length>0,mentions=/pi[eè]ces?\s+jointes?|ci-joint|\bpj\b/i.test(sent.text);
+ const L=[`${c.hello||'Bonjour'} ${first}${c.hello==='Coucou'?' !':','}`,''];
+ L.push(v?`Merci pour votre message${sent.subject?` « ${sent.subject} »`:''}, je l'ai bien reçu.`:`Merci pour ton message${sent.subject?` « ${sent.subject} »`:''}, je l'ai bien reçu !`);
+ if(!sent.subject)L.push(v?"Petite remarque : votre message n'avait pas d'objet. Pensez à en mettre un, cela aide à s'y retrouver.":"Petite remarque : ton message n'avait pas d'objet. Pense à en mettre un, ça aide à s'y retrouver 😉");
+ if(hasAtt){const n=sent.attachments.length;L.push(`J'ai bien reçu ${n>1?`les ${n} pièces jointes`:'la pièce jointe'} (${sent.attachments.map(a=>a.name).join(', ')}). Merci !`)}
+ else if(mentions)L.push(v?"Vous parlez d'une pièce jointe, mais je ne vois aucun fichier attaché au message. Vous avez peut-être oublié de le joindre ?":"Tu parles d'une pièce jointe, mais je ne vois aucun fichier attaché au message. Tu as peut-être oublié de le joindre ?");
+ if(sent.cc.length)L.push(v?`(Je vois que vous avez mis ${sent.cc.map(nameOf).join(', ')} en copie.)`:`(Je vois que tu as mis ${sent.cc.map(nameOf).join(', ')} en copie.)`);
+ L.push('',c.sign);
+ return{from:{name:c.name,email:c.email},subject:prefix('RE',sent.subject||'(sans objet)'),text:L.join('\n')+quote(sent)};
+}
+function simulate(m){
+ const ref=S,seen=new Set();let delay=5000;
+ const toL=m.to.map(a=>a.toLowerCase());
+ [...m.to,...m.cc,...(m.bcc||[])].forEach(raw=>{
+  const a=raw.toLowerCase();if(seen.has(a))return;seen.add(a);
+  const k=classify(a);
+  if(k.type==='self'&&!seen.has('#self')){seen.add('#self');setTimeout(()=>deliver(ref,{from:m.from,to:m.to.slice(),cc:m.cc.slice(),subject:m.subject,text:m.text,attachments:m.attachments.map(x=>Object.assign({},x))}),2500)}
+  else if(k.type==='contact'&&toL.includes(a)){const c=k.c;delay+=2500+Math.random()*3000;setTimeout(()=>deliver(ref,makeReply(c,m)),delay)}
+  else if(k.type==='bounce'){setTimeout(()=>deliver(ref,{bounce:true,from:{name:'Service de messagerie',email:'mailer-daemon@'+DOMAIN},subject:'Message non distribué : '+(m.subject||'(sans objet)'),
+   text:`Votre message n'a pas pu être distribué à l'adresse suivante :\n\n      ${raw}\n\nCette adresse n'existe pas ou elle est mal écrite.${k.suggest?`\n\nVouliez-vous dire :  ${k.suggest}  ?`:''}\n\nConseil : vérifiez chaque lettre de l'adresse, puis renvoyez votre message. Vous le retrouverez dans le dossier « Envoyés » (bouton « Transférer »).`,
+   legit:"C'est un message automatique de votre messagerie : il vous prévient qu'une adresse était mal écrite. Il est fiable."}),3500)}
+ });
+}
+
+/* ---------- contacts ---------- */
+async function contactDialog(c){
+ const isEdit=!!(c&&contactOf(c.email)&&c.edit);
+ const r=await dialog({title:isEdit?'Modifier le contact':'Ajouter un contact',body:`<label for="cn">Nom</label><input class="field" id="cn" name="cn" value="${esc(c&&c.name||'')}" placeholder="Ex. : Jeanne Durand"><label for="ce">Adresse e-mail</label><input class="field" id="ce" name="ce" value="${esc(c&&c.email||'')}" placeholder="Ex. : jeanne.durand@cocotte-mail.fr" spellcheck="false">`,buttons:[{label:'Annuler',value:false},{label:'Enregistrer',value:true,primary:true}]});
+ if(!r)return;
+ const name=(dialog.vals.cn||'').trim(),email=(dialog.vals.ce||'').trim();
+ if(!validAddr(email)){await dialog({title:'Adresse incorrecte',body:`<p>« ${esc(email)} » n'est pas une adresse valide : ${badReason(email)}.</p>`});return contactDialog({name,email,edit:isEdit,orig:c&&c.orig})}
+ const orig=isEdit?(c.orig||c.email):null;
+ const dup=contactOf(email);
+ if(dup&&(!orig||dup.email.toLowerCase()!==orig.toLowerCase())){toast('Ce contact existe déjà');return}
+ if(isEdit){const x=contactOf(orig);x.name=name||email;x.email=email;V.contact=email}
+ else{S.contacts.push({name:name||email,email});if(V.folder==='contacts')V.contact=email}
+ save();render();toast(isEdit?'Contact modifié':`${esc(name||email)} a été ajouté à vos contacts`);
+}
+
+/* ---------- settings & help ---------- */
+async function settings(){
+ const r=await dialog({title:'Paramètres',wide:true,body:`<label for="sth">Apparence de la messagerie</label><select class="field" id="sth" name="sth">${themeOptions(S.theme||'classique')}</select><label for="sf">Prénom</label><input class="field" id="sf" name="sf" value="${esc(S.user.first)}"><label for="sl">Nom</label><input class="field" id="sl" name="sl" value="${esc(S.user.last)}"><label>Mon adresse e-mail</label><p class="okbox" style="margin-top:.3rem">${esc(S.user.email)}</p><label for="ss">Ma signature</label><p class="mut" style="margin:.1rem 0 .2rem;font-size:.85rem">Elle sera ajoutée automatiquement en bas de chaque nouveau message.</p><textarea class="field" id="ss" name="ss" placeholder="Ex. :\nBien cordialement,\nJeanne Durand\n06 00 00 00 00">${esc(S.user.signature)}</textarea>${sec()?`<button class="btn" data-val="security">🔒 Sécurité du compte</button>`:''}<hr style="border:0;border-top:1px solid var(--line);margin:1rem 0"><p class="mut" style="font-size:.88rem">Recommencer l'atelier depuis le début (tous les messages seront remis à zéro) :</p><button class="btn danger" data-val="reset">${ic('restore')} Réinitialiser la messagerie</button>`,buttons:[{label:'Annuler',value:false},{label:'Enregistrer',value:true,primary:true}]});
+ if(r==='security'){securityDialog();return}
+ if(r==='reset'){const ok=await dialog({title:'Tout remettre à zéro ?',body:"<p>Tous vos messages, dossiers et contacts seront effacés et la messagerie reviendra à son état de départ.</p>",buttons:[{label:'Annuler',value:false},{label:'Réinitialiser',value:true,danger:true}]});if(ok){try{localStorage.removeItem(KEY)}catch(e){}S=null;C=null;renderCompose();V.folder='inbox';V.sel=null;V.contact=null;V.checked.clear();V.q='';$('#q').value='';onboarding()}return}
+ if(!r)return;
+ const v=dialog.vals;S.user.first=(v.sf||'').trim()||S.user.first;S.user.last=(v.sl||'').trim();S.user.name=(S.user.first+' '+S.user.last).trim();S.user.signature=(v.ss||'').replace(/\s+$/,'');if(v.sth&&THEMES[v.sth])S.theme=v.sth;
+ S.messages.forEach(m=>{if(m.from.email.toLowerCase()===me())m.from.name=S.user.name});
+ save();render();toast('Paramètres enregistrés');
+}
+function help(){
+ dialog({title:'Petit lexique de la messagerie',wide:true,body:`<dl class="gloss">
+ <dt>Adresse e-mail</dt><dd>Votre « adresse postale » sur Internet, toujours sous la forme <b>nom@fournisseur.fr</b>.</dd>
+ <dt>Boîte de réception</dt><dd>Là où arrivent les messages que l'on vous envoie.</dd>
+ <dt>Objet</dt><dd>Le titre du message, en quelques mots.</dd>
+ <dt>À / Cc / Cci</dt><dd><b>À</b> : le destinataire principal. <b>Cc</b> (copie carbone) : une personne en copie, visible par tous. <b>Cci</b> (copie cachée) : une personne en copie que les autres destinataires ne voient pas.</dd>
+ <dt>Pièce jointe</dt><dd>Un fichier (photo, document…) attaché au message, symbolisé par un trombone 📎.</dd>
+ <dt>Répondre / Répondre à tous</dt><dd>Répondre à l'expéditeur seulement, ou à toutes les personnes qui ont reçu le message.</dd>
+ <dt>Transférer</dt><dd>Envoyer un message reçu à une autre personne.</dd>
+ <dt>Brouillon</dt><dd>Un message commencé mais pas encore envoyé.</dd>
+ <dt>Indésirables (spam)</dt><dd>Les publicités et messages suspects, triés automatiquement.</dd>
+ <dt>Hameçonnage (phishing)</dt><dd>Un faux message qui imite une banque, un livreur, une administration… pour voler vos informations.</dd>
+ <dt>Validation en deux étapes</dt><dd>En plus du mot de passe, un code reçu par SMS est demandé. Ce code ne se donne jamais à personne.</dd>
+ </dl>`,buttons:[{label:'Fermer',value:true,primary:true}]});
+}
+
+/* ---------- security exercises ---------- */
+const EX=[
+ {t:"Vérifier l'expéditeur",d:"<p>Un message de la <b>Banque Horizon</b> vous demande de confirmer vos informations.</p><ol><li>Ouvrez le message.</li><li>Regardez attentivement l'<b>adresse de l'expéditeur</b>, écrite à côté du nom, lettre par lettre.</li><li>Si vous pensez que c'est une arnaque, cliquez sur <b>« Signaler une arnaque »</b>.</li></ol>",tip:"Le nom affiché peut être inventé : c'est l'adresse qui compte."},
+ {t:'Vérifier un lien sans cliquer',d:"<p>Le message de <b>Colis Express</b> contient un lien.</p><ol><li>Ouvrez le message.</li><li>Posez la souris sur le lien <b>sans cliquer</b> : la vraie adresse apparaît en bas à gauche de l'écran.</li><li>Est-ce la même adresse que le texte affiché ? Si non, signalez le message.</li></ol>",tip:"Sur téléphone, un appui long sur un lien permet de voir son adresse sans l'ouvrir."},
+ {t:'Un proche en détresse ?',d:"<p>Vous avez reçu <b>deux messages de « Marie Dupont »</b>.</p><ol><li>Ouvrez-les tous les deux et comparez les adresses des expéditeurs.</li><li>L'un d'eux vous demande de l'argent : lequel est le vrai ?</li><li>Signalez le faux.</li></ol>",tip:"Avant d'envoyer de l'argent, appelez toujours la personne par un autre moyen."},
+ {t:'La pièce jointe piégée',d:"<p>Une <b>facture impayée</b> vous attend en pièce jointe.</p><ol><li>Ouvrez le message, mais <b>n'ouvrez pas</b> la pièce jointe.</li><li>Lisez attentivement le <b>nom du fichier</b> : comment se termine-t-il ?</li><li>Signalez le message.</li></ol>",tip:"Un fichier qui se termine par .exe est un programme, pas un document."},
+ {t:'Sécuriser son compte',d:"<p>L'équipe Cocotte Mail vous conseille de mieux protéger votre messagerie.</p><ol><li>Lisez son message dans la boîte de réception.</li><li>Cliquez sur <b>Paramètres</b> en haut de l'écran, puis sur <b>Sécurité du compte</b>.</li><li>Créez un <b>mot de passe solide</b>, puis activez la <b>validation en deux étapes</b>.</li></ol>",tip:"Un bon mot de passe est long : par exemple une petite phrase facile à retenir, avec des chiffres et des symboles."}
+];
+async function exDialog(n){
+ const x=EX[n-1];if(!x)return;const done=S.ex&&S.ex[n];
+ const r=await dialog({title:`Exercice ${n} / 5 : ${esc(x.t)}`,wide:true,body:(done?`<p class="okbox">✔ Exercice réussi !</p>`:'')+x.d+`<p class="mut">💡 ${x.tip}</p>`,buttons:[{label:'Fermer',value:false},{label:n===5?'Ouvrir la sécurité du compte':'Aller au message',value:'go',primary:true}]});
+ if(r!=='go')return;
+ if(n===5){securityDialog();return}
+ const m=S.messages.find(m=>m.ex===n&&m.folder!=='trash')||S.messages.find(m=>m.ex===n);
+ if(!m){toast("Ce message a été supprimé définitivement. Réinitialisez la messagerie pour le retrouver.");return}
+ V.folder=m.folder;V.q='';$('#q').value='';V.checked.clear();V.contact=null;closeDrawer();
+ if(m.ex===3){V.sel=null;document.body.classList.remove('reading');render();toast('Les deux messages de « Marie Dupont » sont dans la boîte de réception');return}
+ openMsg(m.id);
+}
+function completeEx(n){
+ S.ex=S.ex||{};if(S.ex[n])return;S.ex[n]=true;save();renderSide();
+ const d=Object.keys(S.ex).length;
+ if(d>=5)setTimeout(()=>dialog({title:'🎉 Bravo, 5 exercices sur 5 !',wide:true,body:`<p class="okbox">Vous avez terminé tous les exercices de sécurité.</p><p><b>Les bons réflexes à retenir :</b></p><ul><li>Vérifier l'<b>adresse</b> de l'expéditeur, pas seulement son nom.</li><li>Poser la souris sur un lien <b>avant</b> de cliquer.</li><li>Se méfier de l'<b>urgence</b>, des menaces et des demandes d'argent.</li><li>Ne pas ouvrir une <b>pièce jointe</b> inattendue.</li><li>Ne jamais donner son <b>mot de passe</b> ni un code reçu par SMS.</li><li>Un mot de passe <b>solide</b> et la <b>validation en deux étapes</b>.</li></ul><p class="mut">En cas de doute dans la vraie vie : cybermalveillance.gouv.fr</p>`,buttons:[{label:'Merci !',value:true,primary:true}]}),400);
+ else toast(`✅ Exercice ${n} réussi ! (${d} sur 5)`);
+}
+const CRIT=[['12 caractères ou plus',x=>x.length>=12],['une majuscule',x=>/[A-Z]/.test(x)],['une minuscule',x=>/[a-z]/.test(x)],['un chiffre',x=>/\d/.test(x)],['un caractère spécial (! ? # @ …)',x=>/[^A-Za-z0-9]/.test(x)]];
+async function securityDialog(){
+ const u=S.user;
+ const okS=t=>`<span style="color:var(--green);font-weight:700">${t}</span>`,koS=t=>`<span style="color:var(--red);font-weight:700">${t}</span>`;
+ const p=dialog({title:'🔒 Sécurité du compte',wide:true,body:`<p><b>Mot de passe</b> — niveau actuel : ${u.pwStrong?okS('solide ✔'):koS('faible ✖')}</p>
+ <label for="np">Nouveau mot de passe</label>
+ <div style="display:flex;gap:.4rem;align-items:flex-start"><input class="field" id="np" name="np" type="password" autocomplete="new-password" spellcheck="false" style="margin-bottom:.4rem"><button class="btn" type="button" id="npShow" style="margin-top:.2rem">Afficher</button></div>
+ <div class="meter"><span id="npBar"></span></div><div id="npLbl" class="mut" style="font-size:.85rem;margin:.25rem 0">Tapez un nouveau mot de passe</div>
+ <ul class="crit" id="npCrit"></ul>
+ <button class="btn primary" data-val="pw" id="npSave" disabled>Enregistrer le mot de passe</button>
+ <hr style="border:0;border-top:1px solid var(--line);margin:1.2rem 0">
+ <p><b>Validation en deux étapes</b> — ${u.twofa?okS('activée ✔'):koS('désactivée')}</p>
+ <p class="mut" style="font-size:.9rem">En plus du mot de passe, un code envoyé par SMS est demandé lors d'une connexion sur un nouvel appareil. Même si quelqu'un vole votre mot de passe, il ne pourra pas entrer.</p>
+ ${u.twofa?'':'<button class="btn primary" data-val="2fa">Activer la validation en deux étapes</button>'}`,buttons:[{label:'Fermer',value:false}]});
+ const np=$('#np'),bar=$('#npBar'),lbl=$('#npLbl'),cr=$('#npCrit'),sv=$('#npSave');
+ const upd=()=>{const v=np.value;const res=CRIT.map(([t,f])=>[t,f(v)]);const n=res.filter(x=>x[1]).length;
+  const nv=norm(v);const banned=v&&(['motdepasse','password','azerty','123456','soleil','qwerty'].some(w=>nv.includes(w))||(norm(u.first).length>2&&nv.includes(norm(u.first))));
+  cr.innerHTML=res.map(([t,ok])=>`<li class="${ok?'ok':''}">${ok?'✔':'✖'} ${t}</li>`).join('')+(banned?`<li style="color:var(--red)">✖ évitez votre prénom et les mots trop connus (azerty, 123456, soleil…)</li>`:'');
+  const lv=!v?0:banned?1:n;bar.style.width=(lv*20)+'%';bar.style.background=lv>=5?'var(--green)':lv>=3?'#d97706':'var(--red)';
+  lbl.textContent=!v?'Tapez un nouveau mot de passe':lv>=5?'Solide 💪':lv>=3?'Moyen':'Faible';
+  sv.disabled=!(n===5&&!banned)};
+ np.addEventListener('input',upd);upd();
+ $('#npShow').onclick=()=>{const h=np.type==='password';np.type=h?'text':'password';$('#npShow').textContent=h?'Masquer':'Afficher'};
+ const r=await p;
+ if(r==='pw'){u.pwStrong=true;save();toast('Mot de passe modifié ✔');if(u.twofa)completeEx(5);securityDialog()}
+ else if(r==='2fa')twofaFlow();
+}
+async function twofaFlow(){
+ const r=await dialog({title:'Validation en deux étapes (1/2)',body:`<p>Indiquez le numéro de téléphone portable qui recevra les codes de sécurité.</p><label for="ph">Numéro de portable</label><input class="field" id="ph" name="ph" inputmode="tel" placeholder="06 12 34 56 78"><p class="mut" style="font-size:.85rem">Dans l'atelier, aucun SMS n'est vraiment envoyé : le code apparaîtra à l'écran.</p>`,buttons:[{label:'Annuler',value:false},{label:'Recevoir le code',value:true,primary:true}]});
+ if(!r)return securityDialog();
+ const ph=(dialog.vals.ph||'').replace(/[\s.\-]/g,'');
+ if(!/^(0|\+33)[67]\d{8}$/.test(ph)){await dialog({title:'Numéro incorrect',body:'<p>Indiquez un numéro de portable français à 10 chiffres, commençant par 06 ou 07.</p>'});return twofaFlow()}
+ const code=String(Math.floor(100000+Math.random()*900000));
+ setTimeout(()=>toast(`📱 SMS reçu : « Votre code Cocotte Mail est <b>${code}</b>. Ne le communiquez à personne. »`,null,20000),1200);
+ for(let i=0;i<3;i++){
+  const ok=await dialog({title:'Validation en deux étapes (2/2)',body:`<p>Un code à 6 chiffres vient d'être envoyé au ${esc(ph.replace(/^(\+33|0)(\d)(\d{2})(\d{2})(\d{2})(\d{2})$/,'0$2 $3 $4 $5 $6'))}.</p><label for="cd">Code reçu par SMS</label><input class="field" id="cd" name="cd" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><p class="alertbox" style="font-size:.88rem">⚠️ Ce code est secret. Un vrai service ne vous le demandera <b>jamais</b> par téléphone ou par mail : si quelqu'un vous le réclame, c'est une arnaque.</p>`,buttons:[{label:'Annuler',value:false},{label:'Valider',value:true,primary:true}]});
+  if(!ok)return securityDialog();
+  if((dialog.vals.cd||'').trim()===code){S.user.twofa=true;save();toast('Validation en deux étapes activée ✔');if(S.user.pwStrong)completeEx(5);return securityDialog()}
+  if(i<2)await dialog({title:'Code incorrect',body:'<p>Le code ne correspond pas. Regardez bien le SMS affiché en bas de l\'écran et réessayez.</p>'});
+ }
+ toast('Trop d\'essais. Recommencez depuis Paramètres › Sécurité du compte.');
+}
+
+
+/* ---------- missions de l'atelier (mode Découverte) ---------- */
+const MAIL=n=>n+'@'+DOMAIN;
+const MI=[
+ {t:'Faire le tour de sa messagerie',go:null,d:"<p>Votre messagerie range les messages dans des <b>dossiers</b>, à gauche de l'écran.</p><ol><li>Cliquez sur <b>{sent}</b> et ouvrez un message.</li><li>Faites de même dans <b>{drafts}</b>, <b>{spam}</b> et <b>{trash}</b>.</li></ol>",tip:'Les messages écrits en gras ne sont pas encore lus.'},
+ {t:'Répondre à Marie',go:'marie',d:"<p>Marie vous a envoyé une photo de la tournée d'été.</p><ol><li>Ouvrez son message.</li><li>Cliquez sur <b>Répondre</b>.</li><li>Écrivez-lui une phrase, puis cliquez sur <b>Envoyer</b>.</li></ol>",tip:"« RE : » s'ajoute tout seul devant l'objet : c'est une réponse."},
+ {t:'Répondre à tous',go:'paul',d:"<p>Paul organise un repas et a écrit à plusieurs personnes.</p><ol><li>Ouvrez son message « Repas de famille le 15 ».</li><li>Cliquez sur <b>Répondre à tous</b>.</li><li>Dites ce que vous apportez, puis envoyez.</li></ol>",tip:'« Répondre à tous » : tout le monde reçoit votre réponse, pas seulement Paul.'},
+ {t:'Écrire un mail avec une copie',go:'new',d:"<ol><li>Cliquez sur <b>{compose}</b>.</li><li>Dans <b>À</b>, écrivez à Paul.</li><li>Cliquez sur <b>Cc / Cci</b> et mettez Sophie dans <b>Cc</b>.</li><li>Écrivez un <b>objet</b> et un message, puis envoyez.</li></ol>",tip:'Cc = copie : Paul voit que Sophie a aussi reçu le message.'},
+ {t:'Ouvrir une pièce jointe',go:'marie',d:"<ol><li>Ouvrez le message de Marie.</li><li>En bas du message, cliquez sur la photo (la <b>pièce jointe</b>).</li><li>Regardez-la, puis cliquez sur <b>Télécharger</b>.</li></ol>",tip:'Le trombone 📎 signale une pièce jointe.'},
+ {t:'Envoyer une pièce jointe',go:'new',d:"<ol><li>Cliquez sur <b>{compose}</b> et écrivez à un contact.</li><li>Cliquez sur <b>Joindre un fichier</b> et choisissez une photo ou un document.</li><li>Ajoutez un objet et un petit mot, puis envoyez.</li></ol>",tip:'Vérifiez toujours que la pièce jointe est bien là avant d’envoyer.'},
+ {t:'La copie cachée',go:'new',d:"<ol><li>Cliquez sur <b>{compose}</b> et écrivez à un contact.</li><li>Cliquez sur <b>Cc / Cci</b> et mettez une autre personne dans <b>Cci</b>.</li><li>Ajoutez un objet et un message, puis envoyez.</li></ol>",tip:'Cci = copie cachée : la personne reçoit le message, mais les autres ne le savent pas.'},
+ {t:'Transférer un mail',go:'rando',d:"<p>Le club de marche a envoyé le programme de dimanche.</p><ol><li>Ouvrez son message.</li><li>Cliquez sur <b>Transférer</b>.</li><li>Envoyez-le à Marie avec un petit mot.</li></ol>",tip:'Transférer garde les pièces jointes, Répondre ne les garde pas.'}
+];
+const keyMsg=k=>S.messages.find(m=>m.k===k&&m.folder!=='trash')||S.messages.find(m=>m.k===k);
+function onOpen(m){
+ if(sec())return;
+ S.visit=S.visit||{};
+ if(['sent','drafts','spam','trash'].includes(m.folder)&&!S.visit[m.folder]){S.visit[m.folder]=true;save()}
+ if(['sent','drafts','spam','trash'].every(f=>S.visit[f]))doneMi(1);
+}
+function onSent(i){
+ if(sec())return;
+ const k=i.src&&i.src.k,has=(l,a)=>l.some(x=>x.toLowerCase()===a);
+ if(i.kind==='reply'&&k==='marie')doneMi(2);
+ if(i.kind==='replyall'&&k==='paul')doneMi(3);
+ if(i.kind!=='reply'&&i.kind!=='replyall'&&i.kind!=='fwd'&&i.subject&&i.cc.length)doneMi(4);
+ if(i.kind!=='fwd'&&i.atts)doneMi(6);
+ if(i.bcc.length)doneMi(7);
+ if(i.kind==='fwd'&&k==='rando')doneMi(8);
+ const d=S.defi;
+ if(d&&!(S.mi&&S.mi.defi)){
+  if(i.kind==='replyall'&&k==='paul')d.ra=true;
+  if(i.kind==='fwd'&&k==='paul'&&has(i.to,MAIL('sophie.bernard'))&&has(i.bcc,MAIL('marie.dupont'))&&i.atts)d.fw=true;
+  save();
+  if(d.ra&&d.fw){S.mi.defi=true;save();renderSide();setTimeout(()=>dialog({title:'🏁 Défi réussi !',wide:true,body:`<p class="okbox">Bravo, vous avez réussi le défi final sans aide.</p><p>Vous savez maintenant répondre à tous, transférer un message, mettre quelqu'un en copie cachée et joindre une photo.</p>`,buttons:[{label:'Merci !',value:true,primary:true}]}),900)}
+ }
+}
+function doneMi(n){
+ if(sec())return;
+ S.mi=S.mi||{};if(S.mi[n])return;S.mi[n]=true;save();renderSide();
+ const c=MI.filter((x,i)=>S.mi[i+1]).length;
+ if(c>=MI.length)setTimeout(()=>dialog({title:'🎉 Bravo, 8 missions sur 8 !',wide:true,body:`<p class="okbox">Vous avez terminé toutes les missions de l'atelier.</p><p><b>À retenir :</b></p><ul><li><b>Répondre</b> : seul l'expéditeur reçoit la réponse. <b>Répondre à tous</b> : tout le monde la reçoit.</li><li><b>Cc</b> : tout le monde voit qui est en copie. <b>Cci</b> : la copie reste cachée.</li><li><b>Transférer</b> garde les pièces jointes.</li><li>Un mail a toujours un <b>objet</b> et un petit mot.</li></ul><p>Quand l'animateur vous le dira, ouvrez le <b>Défi final</b>.</p>`,buttons:[{label:'Super !',value:true,primary:true}]}),900);
+ else toast(`✅ Mission ${n} réussie ! (${c} sur ${MI.length})`);
+}
+async function miDialog(n){
+ const x=MI[n-1];if(!x)return;const done=S.mi&&S.mi[n];
+ const btn=x.go==='new'?[{label:TH().compose,value:'go',primary:true}]:x.go?[{label:'Aller au message',value:'go',primary:true}]:[];
+ const r=await dialog({title:`Mission ${n} / ${MI.length} : ${esc(x.t)}`,wide:true,body:(done?`<p class="okbox">✔ Mission réussie !</p>`:'')+tt(x.d)+`<p class="mut">💡 ${x.tip}</p>`,buttons:[{label:'Fermer',value:false,primary:!btn.length}].concat(btn)});
+ if(r!=='go')return;
+ if(x.go==='new'){openCompose();return}
+ const m=keyMsg(x.go);
+ if(!m){toast("Ce message a été supprimé définitivement. Réinitialisez la messagerie pour le retrouver.");return}
+ V.folder=m.folder;V.q='';$('#q').value='';V.checked.clear();V.contact=null;openMsg(m.id);
+}
+async function defiDialog(){
+ if(!S.defi){S.defi={ra:false,fw:false};save()}
+ const done=S.mi&&S.mi.defi;
+ await dialog({title:'🏁 Défi final',wide:true,body:(done?`<p class="okbox">✔ Défi réussi !</p>`:'')+`<p>Paul organise le repas de famille.</p><ol><li>Répondez <b>à tous</b> à son message pour dire ce que vous apportez.</li><li>Puis <b>transférez</b> son message à <b>Sophie</b>, avec <b>Marie en copie cachée</b>, en y <b>joignant une photo</b>.</li></ol><p class="mut">Cette fois, à vous de jouer sans aide !</p>`,buttons:[{label:"C'est parti",value:true,primary:true}]});
+}
+
+/* ---------- onboarding ---------- */
+function onboarding(){
+ const ov=document.createElement('div');ov.className='onb';
+ ov.innerHTML=`<form class="card"><span class="brand"><span class="logo">${ic('mail')}</span>Cocotte Mail</span><h1>Créons votre boîte mail d'entraînement</h1><p class="mut">Indiquez votre prénom et votre nom : nous allons créer votre adresse e-mail fictive.</p><label for="of"><b>Prénom</b></label><input class="field" id="of" required autocomplete="off"><label for="ol"><b>Nom</b></label><input class="field" id="ol" autocomplete="off"><div class="mut" style="font-size:.88rem">Votre adresse sera :</div><div class="preview" id="op">prenom.nom@${DOMAIN}</div><div class="mut" style="font-size:.88rem">Choisissez l'atelier :</div><div class="modes"><label><input type="radio" name="om" value="decouverte" checked><span><b>1. Découvrir la messagerie</b><br><small class="mut">lire, écrire, répondre, ranger…</small></span></label><label><input type="radio" name="om" value="securite"><span><b>2. La sécurité</b><br><small class="mut">repérer les arnaques, protéger son compte</small></span></label></div><label for="oth"><b>Apparence</b></label><select class="field" id="oth" name="oth">${themeOptions('classique')}</select><button class="btn primary" style="width:100%;justify-content:center;padding:.8rem">Ouvrir ma messagerie</button></form>`;
+ document.body.appendChild(ov);
+ const f=ov.querySelector('#of'),l=ov.querySelector('#ol'),p=ov.querySelector('#op');
+ const up=()=>{const loc=[slug(f.value),slug(l.value)].filter(Boolean).join('.');p.textContent=(loc||'prenom.nom')+'@'+DOMAIN};
+ f.oninput=up;l.oninput=up;f.focus();
+ if(location.hash==='#securite')ov.querySelector('input[value=securite]').checked=true;
+ ov.querySelector('form').onsubmit=e=>{e.preventDefault();if(!f.value.trim()){f.focus();return}const md=ov.querySelector('input[name=om]:checked').value;seed(f.value,l.value,md);S.theme=ov.querySelector('#oth').value||'classique';save();ov.remove();applyFs();render();setTimeout(()=>{toast('📩 Vous avez de nouveaux messages !');if(sec())exDialog(1);else miDialog(1)},600)};
+}
+
+/* ---------- events ---------- */
+function closeDrawer(){document.body.classList.remove('drawer')}
+function applyFs(){document.documentElement.style.setProperty('--fs',(S&&S.fs||17)+'px')}
+document.addEventListener('click',async e=>{
+ if(!S)return;
+ const t=e.target;
+ // compose
+ const c=t.closest('[data-c]');
+ if(c&&C){const k=c.dataset.c;
+  if(k==='close')closeCompose();
+  else if(k==='cc'){readFields();C.showCc=!C.showCc;document.querySelectorAll('.ccrow').forEach(r=>r.hidden=!C.showCc);if(C.showCc)$('#cCc').focus()}
+  else if(k==='send')sendMail();
+  else if(k==='draft')saveDraft(false);
+  else if(k==='discard')discardCompose();
+  else if(k==='attach')popMenu(c,[{label:ic('folder')+' Depuis « Mes documents »',fn:pickDoc},{label:ic('download')+' Depuis mon ordinateur…',fn:()=>$('#cFile').click()}]);
+  return}
+ const rm=t.closest('[data-rmatt]');if(rm&&C){C.atts.splice(+rm.dataset.rmatt,1);C.dirty=true;renderAtts();return}
+ // links in messages
+ const a=t.closest('.mbody a');
+ if(a){e.preventDefault();const m=byId(V.sel);
+  if(a.classList.contains('trap'))trapDialog(m);
+  else if(a.classList.contains('unsub'))dialog({title:'Désabonnement',body:`<p>Dans la vraie vie, ce lien vous mènerait sur le site de l'expéditeur pour confirmer que vous ne voulez plus recevoir sa lettre d'information.</p><p class="mut">Adresse du lien : ${esc(a.dataset.url)}</p><p class="mut">⚠️ N'utilisez ce lien que pour des lettres auxquelles vous vous êtes vraiment abonné. Dans un message suspect, ne cliquez sur rien, même pas « Se désabonner ».</p>`});
+  else dialog({title:'Lien',body:`<p>Ce lien mène à l'adresse :</p><p class="okbox" style="word-break:break-all">${esc(a.dataset.url||a.getAttribute('href')||'')}</p><p class="mut">Dans l'atelier, les liens ne s'ouvrent pas.</p>`});
+  return}
+ const at=t.closest('[data-att]');if(at){const m=byId(V.sel);if(m)openAtt(m,+at.dataset.att);return}
+ const st=t.closest('[data-star]');if(st){const m=byId(+st.dataset.star);m.starred=!m.starred;save();render();toast(m.starred?'Ajouté aux favoris ⭐':'Retiré des favoris');return}
+ const ck=t.closest('[data-chk]');if(ck){const id=+ck.dataset.chk;ck.checked?V.checked.add(id):V.checked.delete(id);renderList();return}
+ if(t.id==='chkAll'){const ms=listMsgs();if(t.checked)ms.forEach(m=>V.checked.add(m.id));else V.checked.clear();renderList();return}
+ const fo=t.closest('[data-folder]');if(fo){V.folder=fo.dataset.folder;V.sel=null;V.contact=null;V.checked.clear();V.q='';$('#q').value='';document.body.classList.remove('reading');closeDrawer();render();return}
+ const exb=t.closest('[data-ex]');if(exb){closeDrawer();exDialog(+exb.dataset.ex);return}
+ const mib=t.closest('[data-mi]');if(mib){closeDrawer();const v=mib.dataset.mi;v==='defi'?defiDialog():miDialog(+v);return}
+ const ct=t.closest('[data-contact]');if(ct){V.contact=ct.dataset.contact;document.body.classList.add('reading');render();return}
+ const row=t.closest('.row[data-id]');if(row){openMsg(+row.dataset.id);return}
+ const ab=t.closest('[data-act]');if(!ab)return;
+ const m=V.sel!=null?byId(V.sel):null;
+ switch(ab.dataset.act){
+  case 'compose':openCompose();break;
+  case 'menu':document.body.classList.toggle('drawer');break;
+  case 'newfolder':{const n=await newFolder();if(n){V.folder='f:'+n;V.sel=null;V.checked.clear();closeDrawer();render()}break}
+  case 'back':V.sel=null;V.contact=null;document.body.classList.remove('reading');render();break;
+  case 'reply':m&&reply(m,false);break;
+  case 'replyall':m&&reply(m,true);break;
+  case 'fwd':m&&forward(m);break;
+  case 'del':m&&delMsgs([m.id]);break;
+  case 'move':m&&moveMenu(ab,[m.id]);break;
+  case 'unread':if(m){m.read=false;V.sel=null;document.body.classList.remove('reading');save();render();toast('Marqué comme non lu')}break;
+  case 'report':m&&report(m);break;
+  case 'notspam':m&&notSpam(m);break;
+  case 'restore':if(m){const to=m.prev&&m.prev!=='trash'&&(m.prev.indexOf('f:')!==0||S.folders.includes(m.prev.slice(2)))?m.prev:'inbox';m.folder=to;V.sel=null;document.body.classList.remove('reading');save();render();toast(`Message restauré dans « ${esc(folderLabel(to))} »`)}break;
+  case 'purge':m&&purge([m.id]);break;
+  case 'emptytrash':purge(inFolder('trash').map(x=>x.id));break;
+  case 'emptyspam':{const ids=inFolder('spam').map(x=>x.id);const ok=await dialog({title:'Supprimer tous les indésirables ?',body:'<p>Les messages seront placés dans la corbeille.</p>',buttons:[{label:'Annuler',value:false},{label:'Tout supprimer',value:true,danger:true}]});if(ok)delMsgs(ids);break}
+  case 'delfolder':{const n=V.folder.slice(2);const ms=inFolder(V.folder);const ok=await dialog({title:`Supprimer le dossier « ${esc(n)} » ?`,body:`<p>${ms.length?`Les ${ms.length} message(s) qu'il contient seront remis dans la boîte de réception.`:'Ce dossier est vide.'}</p>`,buttons:[{label:'Annuler',value:false},{label:'Supprimer le dossier',value:true,danger:true}]});if(ok){ms.forEach(x=>x.folder='inbox');S.folders=S.folders.filter(x=>x!==n);V.folder='inbox';V.sel=null;save();render();toast('Dossier supprimé')}break}
+  case 'b-del':delMsgs([...V.checked]);break;
+  case 'b-move':moveMenu(ab,[...V.checked]);break;
+  case 'b-read':V.checked.forEach(id=>{const x=byId(id);if(x)x.read=true});V.checked.clear();save();render();break;
+  case 'b-unread':V.checked.forEach(id=>{const x=byId(id);if(x)x.read=false});V.checked.clear();save();render();break;
+  case 'b-clear':V.checked.clear();renderList();break;
+  case 'clearq':V.q='';$('#q').value='';V.sel=null;render();break;
+  case 'settings':settings();break;
+  case 'help':help();break;
+  case 'fs-':S.fs=Math.max(14,(S.fs||17)-1);applyFs();save();break;
+  case 'fs+':S.fs=Math.min(24,(S.fs||17)+1);applyFs();save();break;
+  case 'addcontact':contactDialog();break;
+  case 'addsender':m&&contactDialog({name:m.from.name,email:m.from.email});break;
+  case 'writecontact':{const c=contactOf(V.contact);c&&openCompose({to:c.email+', '});break}
+  case 'editcontact':{const c=contactOf(V.contact);c&&contactDialog({name:c.name,email:c.email,edit:true,orig:c.email});break}
+  case 'delcontact':{const c=contactOf(V.contact);if(!c)break;const ok=await dialog({title:'Supprimer ce contact ?',body:`<p>${esc(c.name)} (${esc(c.email)}) sera retiré de vos contacts. Les messages ne sont pas supprimés.</p>`,buttons:[{label:'Annuler',value:false},{label:'Supprimer',value:true,danger:true}]});if(ok){S.contacts=S.contacts.filter(x=>x!==c);V.contact=null;document.body.classList.remove('reading');save();render();toast('Contact supprimé')}break}
+ }
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&e.target.matches&&e.target.matches('.row[data-id],.row[data-contact]')){e.preventDefault();e.target.click()}
+});
+// link hover → status bar
+const status=$('#status');
+document.addEventListener('mouseover',e=>{const a=e.target.closest&&e.target.closest('.mbody a[data-url]');if(a){status.textContent=a.dataset.url;status.style.display='block'}});
+document.addEventListener('mouseout',e=>{const a=e.target.closest&&e.target.closest('.mbody a[data-url]');if(a&&!a.contains(e.relatedTarget))status.style.display='none'});
+let qT;$('#q').addEventListener('input',e=>{clearTimeout(qT);qT=setTimeout(()=>{V.q=e.target.value.trim();V.checked.clear();if(V.folder==='contacts')V.folder='inbox';renderList();renderSide()},150)});
+
+/* ---------- page « Présentation de la séance » (#seance) ---------- */
+const SEANCE_OBJ=[['inbox','Retrouver un message dans les dossiers'],['reply','Lire un mail, répondre et répondre à tous'],['users','Écrire un mail avec une copie ou une copie cachée'],['clip','Ouvrir et envoyer une pièce jointe'],['forward','Transférer un mail']];
+const SEANCE_STEPS=[['Accueil',10,''],['Je découvre ma messagerie',15,'Mission 1'],['Je lis, je réponds, j\'écris',30,'Missions 2, 3 et 4'],['Pause',10,'',true],['Les pièces jointes',20,'Missions 5 et 6'],['Copie cachée et transfert',15,'Missions 7 et 8'],['Défi final',10,'🏁 Sans aide'],['Bilan',10,'']];
+const SKEY='cocotte-mail-seance-etape';
+function seanceStep(){const n=parseInt(localStorage.getItem(SKEY),10);return isNaN(n)?-1:Math.max(-1,Math.min(SEANCE_STEPS.length-1,n))}
+function renderSeance(){
+ let el=document.getElementById('seance');
+ if(location.hash!=='#seance'){if(el)el.remove();return}
+ if(!el){el=document.createElement('div');el.id='seance';el.className='seance';document.body.appendChild(el)}
+ const cur=seanceStep();
+ el.innerHTML=`<div class="s-top"><span class="logo">${ic('mail')}</span><div><h1>Atelier : gérer ses mails</h1><p class="s-goal">Objectif : échanger par mail avec aisance, comme par SMS.</p></div><div class="s-foot"><button class="btn" data-s="prev">◀ Étape précédente</button><button class="btn" data-s="next">Étape suivante ▶</button><button class="btn primary" data-s="open">${ic('mail')} Ouvrir la messagerie</button></div></div>
+ <div class="s-main"><section><h2>Aujourd'hui, je vais apprendre à :</h2><ul class="s-obj">${SEANCE_OBJ.map(([i,t])=>`<li>${ic(i)}<span>${t}</span></li>`).join('')}</ul></section>
+ <section><h2>Le déroulé de la séance (2h)</h2><ol class="s-steps">${SEANCE_STEPS.map(([t,d,m,p],i)=>`<li class="${p?'pause ':''}${i<cur?'done':i===cur?'cur':''}"><span class="n">${i<cur?'✔':i+1}</span><span>${t}${m?`<small>${m}</small>`:''}</span><span class="d">${d} min</span></li>`).join('')}</ol></section></div>`;
+}
+function seanceMove(d){const n=Math.max(-1,Math.min(SEANCE_STEPS.length-1,seanceStep()+d));try{localStorage.setItem(SKEY,String(n))}catch(e){}renderSeance()}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-s]');if(!b||!document.getElementById('seance'))return;e.stopPropagation();const k=b.dataset.s;if(k==='prev')seanceMove(-1);else if(k==='next')seanceMove(1);else if(k==='open'){history.replaceState(null,'',location.pathname+location.search);renderSeance()}},true);
+document.addEventListener('keydown',e=>{if(!document.getElementById('seance'))return;if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();seanceMove(1)}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();seanceMove(-1)}});
+window.addEventListener('hashchange',renderSeance);
+
+/* ---------- start ---------- */
+$('#menuBtn').innerHTML=ic('menu');$('#logo').innerHTML=ic('mail');$('#searchIc').innerHTML=ic('search');
+$('#helpBtn').innerHTML=ic('help')+'<span class="lbl">Lexique</span>';$('#setBtn').innerHTML=ic('gear')+'<span class="lbl">Paramètres</span>';
+load();
+if(S){applyFs();render()}else onboarding();
+renderSeance();
+})();
+</script>
+</body>
+</html>
